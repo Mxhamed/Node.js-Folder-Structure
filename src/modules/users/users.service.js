@@ -1,9 +1,10 @@
-import { generateToken } from "../../utils/jwt.js";
-import { UserModel } from "../../database/models/index.js";
-import { ERROR_MESSAGES } from "../../constants/error-messages.js";
-import {} from "../../utils/password.js";
+import { User } from "../../database/models/index.js";
+import { ERROR_MESSAGES } from "../../constants/index.js";
 import {
+  generateToken,
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-} from "../../utils/AppError.js";
+  hashPassword,
+  verifyPassword,
+} from "../../utils/index.js";
