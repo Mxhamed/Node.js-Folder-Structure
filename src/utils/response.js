@@ -10,7 +10,7 @@ import { ERROR_MESSAGES, HTTP_STATUS } from "../constants/index.js";
  */
 export const sendSuccess = (
   res,
-  { data, message, statusCode = HTTP_STATUS.OK } = {},
+  { data, message, statusCode = HTTP_STATUS.OK },
 ) => {
   const response = {
     success: true,
@@ -34,7 +34,7 @@ export const sendSuccess = (
  */
 export const sendError = (
   res,
-  { message, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR, errors } = {},
+  { message, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR, errors },
 ) => {
   const response = {
     success: false,
@@ -60,7 +60,7 @@ export const sendError = (
  * @param {boolean} options.pagination.hasMore - Whether More Pages Exist
  * @param {string} options.message - message (OPTIONAL)
  */
-export const sendPaginated = (res, { data, pagination, message } = {}) => {
+export const sendPaginated = (res, { data, pagination, message }) => {
   return res.status(HTTP_STATUS.OK).json({
     success: true,
     statusCode: HTTP_STATUS.OK,
