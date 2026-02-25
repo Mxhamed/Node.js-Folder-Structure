@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: date,
       default: Date.now, // Pass the Function Reference
     }
+    profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile"
+    },
   }, {
     versionKey: false, // Removes the `__v` Field
     timestamps: true, // Adds `createdAt` & `updatedAt` Fields
