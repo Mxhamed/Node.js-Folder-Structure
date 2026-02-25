@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: date,
       default: Date.now, // Pass the Function Reference
-    }
+    },
     profile: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Profile"
