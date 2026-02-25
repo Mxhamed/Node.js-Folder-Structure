@@ -29,6 +29,7 @@ export const PORT = parseInt(process.env.PORT, 10) || 3000;
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export const DB_URI = process.env.DB_URI;
+export const DB_NAME = process.env.DB_NAME;
 
 // Validate Database Config
 if (!DB_URI) throw new Error("DB_URI is Required in Environment Variables");

@@ -22,23 +22,25 @@ const userSchema = new mongoose.Schema(
       max: 120,
     },
     role: {
-      type: String, enum: Object.values(USER_ROLES),
+      type: String,
+      enum: Object.values(USER_ROLES),
       default: USER_ROLES.USER,
     },
     lastLogin: {
-      type: date,
+      type: Date,
       default: Date.now, // Pass the Function Reference
     },
     profile: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile"
+      ref: "Profile",
     },
-  }, {
+  },
+  {
     versionKey: false, // Removes the `__v` Field
     timestamps: true, // Adds `createdAt` & `updatedAt` Fields
     toJSON: { virtuals: true }, // Include Virtuals When Converting to JSON
     toObject: { virtuals: true }, // Include Virtuals When Converting to Plain Object
-    id: false // Disables Automatic `id` Getter
+    id: false, // Disables Automatic `id` Getter
   },
 );
 

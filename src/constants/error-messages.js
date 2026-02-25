@@ -11,7 +11,9 @@ export const ERROR_MESSAGES = {
   UNAUTHORIZED: "Authentication Required",
   INVALID_CREDENTIALS: "Invalid Email or Password",
   NO_TOKEN: "NO Authentication Token Provided",
-  INVALID_TOKEN: "Invalid or Expired Token",
+  INVALID_TOKEN: "Invalid Token",
+  EXPIRED_TOKEN: "Token has Expired",
+  INVALID_TOKEN_TYPE: "Invalid Token Type",
   FORBIDDEN: "You DON'T have Permission to Access this Resource",
 
   // Validation

@@ -1,4 +1,5 @@
 import argon2 from "argon2";
+import { BadRequestError } from "./AppError.js";
 import {
   ARGON2_HASH_LENGTH,
   ARGON2_TIME_COST,
@@ -25,7 +26,7 @@ const ARGON2_CONFIG = {
  * @returns {Promise<string>} Hashed Password
  */
 export const hashPasswordArgon2 = async (password) => {
-  if (!password) throw new Error("Password CANNOT be Empty");
+  if (!password) throw new BadRequestError("Password CANNOT be Empty");
   return await argon2.hash(password, ARGON2_CONFIG);
 };
 
@@ -36,7 +37,8 @@ export const hashPasswordArgon2 = async (password) => {
  * @returns {Promise<boolean>} True If Password Matches
  */
 export const verifyPassword = async (password, hash) => {
-  if (!password || !hash) throw new Error("Password and Hash are Required");
+  if (!password || !hash)
+    throw new BadRequestError("Password and Hash are Required");
 
   try {
     return await argon2.verify(hash, password);

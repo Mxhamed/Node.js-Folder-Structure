@@ -1,29 +1,12 @@
 import jwt from "jsonwebtoken";
 import { BadRequestError } from "./AppError.js";
-import { TOKEN_TYPES } from "../constants/index.js";
+import { ERROR_MESSAGES, TOKEN_TYPES } from "../constants/index.js";
 import {
   JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_SECRET,
   JWT_REFRESH_EXPIRES_IN,
 } from "../../config/config.service.js";
-
-/**
- * Get Token Configuration Based on Type
- * @param {string} type - Token Type from TOKEN_TYPES
- * @returns {Object} { secret, expiresIn }
- * @private
- */
-const getTokenConfig = (type) => {
-  switch (type) {
-    case TOKEN_TYPES.ACCESS:
-      return { secret: JWT_ACCESS_SECRET, expiresIn: JWT_ACCESS_EXPIRES_IN };
-    case TOKEN_TYPES.REFRESH:
-      return { secret: JWT_REFRESH_SECRET, expiresIn: JWT_REFRESH_EXPIRES_IN };
-    default:
-      throw new BadRequestError(`Invalid Token Type: ${type}`);
-  }
-};
 
 /**
  * Generate JWT
@@ -65,20 +48,26 @@ export const verifyToken = (token, type = TOKEN_TYPES.ACCESS) => {
     const decoded = jwt.verify(token, secret);
 
     // Verify Token Type Matches Expected Type
-    if (decoded.type !== type)
+    if (decoded.type !== type) {
       throw new BadRequestError(
-        `Invalid Token Type. Expected ${type}, Got ${decoded.type}`,
+        `${ERROR_MESSAGES.INVALID_TOKEN_TYPE}. Expected ${type}, Got ${decoded.type}`,
       );
+    }
 
     return decoded;
   } catch (error) {
+    // Handle JWT-Specific Errors
     if (error instanceof jwt.TokenExpiredError)
-      throw new Error("Token has Expired");
+      throw new UnauthorizedError(ERROR_MESSAGES.EXPIRED_TOKEN);
 
     if (error instanceof jwt.JsonWebTokenError)
-      throw new Error("Invalid Token");
+      throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
 
-    throw error;
+    // Re-Throw If It's ALREADY Our Custom Error
+    if (error instanceof BadRequestError) throw error;
+
+    // Unknown Error
+    throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
   }
 };
 
@@ -91,3 +80,22 @@ export const verifyToken = (token, type = TOKEN_TYPES.ACCESS) => {
 export const decodeToken = (token) => {
   return jwt.decode(token);
 };
+
+/**
+ * Get Token Configuration Based on Type
+ * @param {string} type - Token Type from TOKEN_TYPES
+ * @returns {Object} { secret, expiresIn }
+ * @private
+ */
+function getTokenConfig(type) {
+  switch (type) {
+    case TOKEN_TYPES.ACCESS:
+      return { secret: JWT_ACCESS_SECRET, expiresIn: JWT_ACCESS_EXPIRES_IN };
+    case TOKEN_TYPES.REFRESH:
+      return { secret: JWT_REFRESH_SECRET, expiresIn: JWT_REFRESH_EXPIRES_IN };
+    default:
+      throw new BadRequestError(
+        `${ERROR_MESSAGES.INVALID_TOKEN_TYPE}: ${type}`,
+      );
+  }
+}

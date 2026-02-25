@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { BadRequestError } from "./AppError.js";
 import { BCRYPT_ROUNDS } from "../../config/config.service.js";
 
 /**
@@ -7,7 +8,7 @@ import { BCRYPT_ROUNDS } from "../../config/config.service.js";
  * @returns {Promise<string>} Hashed Password
  */
 export const hashPasswordBCrypt = async (password) => {
-  if (!password) throw new Error("Password CANNOT be Empty");
+  if (!password) throw new BadRequestError("Password CANNOT be Empty");
   return await bcrypt.hash(password, BCRYPT_ROUNDS);
 };
 
@@ -18,6 +19,7 @@ export const hashPasswordBCrypt = async (password) => {
  * @returns {Promise<boolean>} True If Password Matches
  */
 export const comparePassword = async (inputPassword, storedHash) => {
-  if (!password || !hash) throw new Error("Password and Hash are Required");
+  if (!password || !hash)
+    throw new BadRequestError("Password and Hash are Required");
   return await bcrypt.compare(inputPassword, storedHash);
 };
