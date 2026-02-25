@@ -1,6 +1,6 @@
 /**
  * Reusable Error Messages
- * Centralized Error Messages for Consistency
+ * Centralized for Consistency
  */
 export const ERROR_MESSAGES = {
   // Rate Limiting
