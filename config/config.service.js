@@ -29,7 +29,10 @@ export const PORT = parseInt(process.env.PORT, 10) || 3000;
 // DATABASE CONFIGURATION
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// MongoDB
 export const DB_URI = process.env.DB_URI;
+
+// Redis
 export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 // Validate Critical Database Config

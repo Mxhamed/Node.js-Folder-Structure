@@ -25,7 +25,7 @@ const ARGON2_CONFIG = {
  * @param {string} password - Plain Text Password
  * @returns {Promise<string>} Hashed Password
  */
-export const hashPasswordArgon2 = async (password) => {
+export const hashPassword = async (password) => {
   if (!password) throw new BadRequestError("Password CANNOT be Empty");
   return await argon2.hash(password, ARGON2_CONFIG);
 };

@@ -19,8 +19,6 @@ export { formatDate, addDays, daysDifference, isPast } from "./date.js";
 
 export { generateToken, decodeToken, verifyToken } from "./jwt.js";
 
-export { hashPasswordArgon2, verifyPassword } from "./password.argon2.js";
-
-export { hashPasswordBCrypt, comparePassword } from "./password.bcrypt.js";
+export { hashPassword, verifyPassword } from "./password.js";
 
 export { sendSuccess, sendError, sendPaginated } from "./response.js";
