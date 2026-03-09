@@ -12,8 +12,10 @@ export const authenticate = (tokenType = TOKEN_TYPES.ACCESS) => {
   return async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader?.startsWith("Bearer "))
-      throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
+    if (!authHeader) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
+
+    if (!authHeader.startsWith("Bearer "))
+      throw new UnauthorizedError(ERROR_MESSAGES.INVALID_AUTH_HEADER);
 
     const token = authHeader.split(" ")[1];
 

@@ -22,6 +22,7 @@ if (result.error) {
 // SERVER CONFIGURATION
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+export const APP_NAME = process.env.APP_NAME || "my_app";
 export const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -29,10 +30,12 @@ export const PORT = parseInt(process.env.PORT, 10) || 3000;
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export const DB_URI = process.env.DB_URI;
-export const DB_NAME = process.env.DB_NAME;
+export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
-// Validate Database Config
+// Validate Critical Database Config
 if (!DB_URI) throw new Error("DB_URI is Required in Environment Variables");
+if (!REDIS_URL)
+  throw new Error("REDIS_URL is Required in Environment Variables");
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // REQUEST CONFIGURATION

@@ -4,7 +4,7 @@ import express from "express";
 import { sendError, NotFoundError } from "./utils/index.js";
 import { rateLimiter } from "./middleware/rate-limit.middleware.js";
 import { ERROR_MESSAGES, HTTP_STATUS } from "./constants/index.js";
-import { connectToMongoDB } from "./database/database.connection.js";
+import { connectToMongoDB, connectToRedis } from "./database/index.js";
 import {
   PORT,
   NODE_ENV,
@@ -28,6 +28,7 @@ export default async function bootstrap() {
 
   // Database Connection
   // await connectToMongoDB();
+  await connectToRedis();
 
   // Security Middleware
   app.use(helmet());
@@ -37,9 +38,6 @@ export default async function bootstrap() {
   app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
   app.use(express.urlencoded({ extended: true, limit: REQUEST_BODY_LIMIT }));
 
-  // Rate Limiting
-  app.use("/api", rateLimiter);
-
   // Health Check
   app.get("/health", (req, res) => {
     res.json({
@@ -48,6 +46,9 @@ export default async function bootstrap() {
       timestamp: new Date().toISOString(),
     });
   });
+
+  // Rate Limiting
+  app.use("/api", rateLimiter);
 
   // API Routes
   // app.use("/api/users", usersRouter);

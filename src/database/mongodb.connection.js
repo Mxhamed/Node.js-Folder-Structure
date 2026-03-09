@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { ALL_MODELS } from "./models/index.js";
 import {
   DB_URI,
-  DB_NAME,
+  APP_NAME,
   IS_DEVELOPMENT,
 } from "../../config/config.service.js";
 
@@ -20,12 +20,12 @@ export const connectToMongoDB = async () => {
 
   try {
     await mongoose.connect(DB_URI, {
-      dbName: DB_NAME,
+      dbName: APP_NAME,
     });
 
     console.log(`🍃  Connected to MongoDB Successfully!`);
     console.log(
-      `📦  Database: ${DB_NAME || mongoose.connection.db.databaseName}`,
+      `📦  Database: ${APP_NAME || mongoose.connection.db.databaseName}`,
     );
 
     // Sync Indexes ONLY in Development

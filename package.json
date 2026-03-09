@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "folder-structure",
+  "name": "my_app",
   "version": "1.0.0",
   "description": "",
   "main": "./src/main.js",
@@ -21,7 +21,8 @@
     "helmet": "^8.1.0",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.5"
+    "mongoose": "^9.1.5",
+    "redis": "^5.11.0"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",
