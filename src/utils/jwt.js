@@ -15,8 +15,8 @@ import {
  * @returns {string} JWT
  *
  * @example
- * const accessToken = generateToken({ userId: 123, role: 'user' });
- * const refreshToken = generateToken({ userId: 123 }, TOKEN_TYPES.REFRESH);
+ * const accessToken = generateToken({ sub: 123, role: USER_ROLES.USER });
+ * const refreshToken = generateToken({ sub: 123 }, TOKEN_TYPES.REFRESH);
  */
 export const generateToken = (payload, type = TOKEN_TYPES.ACCESS) => {
   const { secret, expiresIn } = getTokenConfig(type);
