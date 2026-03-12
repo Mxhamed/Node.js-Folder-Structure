@@ -28,7 +28,7 @@ export const connectToMongoDB = async () => {
       `📦  Database: ${APP_NAME || mongoose.connection.db.databaseName}`,
     );
 
-    // Sync Indexes ONLY in Development
+    // Sync Indexes Only in Development
     if (IS_DEVELOPMENT) await syncIndexes();
 
     // Setup Connection Event Listeners
@@ -41,7 +41,7 @@ export const connectToMongoDB = async () => {
 
 /**
  * Synchronizes Schema Indexes with the Database
- * ONLY Runs in Development to Avoid Production Slowdowns
+ * Only Runs in Development to Avoid Production Slowdowns
  */
 async function syncIndexes() {
   try {

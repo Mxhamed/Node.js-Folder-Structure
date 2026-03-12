@@ -1,17 +1,18 @@
 import cors from "cors";
 import helmet from "helmet";
 import express from "express";
-import { sendError, NotFoundError } from "./utils/index.js";
-import { rateLimiter } from "./middleware/rate-limit.middleware.js";
-import { ERROR_MESSAGES, HTTP_STATUS } from "./constants/index.js";
-import { connectToMongoDB, connectToRedis } from "./database/index.js";
 import {
   PORT,
   NODE_ENV,
+  TRUST_PROXY,
   CORS_ORIGIN,
   IS_DEVELOPMENT,
   REQUEST_BODY_LIMIT,
 } from "../config/config.service.js";
+import { sendError, NotFoundError } from "./utils/index.js";
+import { initializeRateLimiters } from "./middleware/index.js";
+import { ERROR_MESSAGES, HTTP_STATUS } from "./constants/index.js";
+import { connectToMongoDB, connectToRedis, redis } from "./database/index.js";
 // import { usersRouter } from "./modules/index.js";
 
 // CORS Configuration
@@ -25,6 +26,7 @@ const corsOptions = {
 
 export default async function bootstrap() {
   const app = express();
+  app.set("trust proxy", TRUST_PROXY);
 
   // Database Connection
   // await connectToMongoDB();
@@ -48,6 +50,7 @@ export default async function bootstrap() {
   });
 
   // Rate Limiting
+  const { api: rateLimiter } = initializeRateLimiters(redis);
   app.use("/api", rateLimiter);
 
   // API Routes

@@ -15,7 +15,29 @@ export {
 
 export { encrypt, decrypt } from "./crypto.js";
 
-export { formatDate, addDays, daysDifference, isPast } from "./date.js";
+export {
+  formatDate,
+  formatDateLong,
+  formatDateTime,
+  toUnixTimestamp,
+  fromUnixTimestamp,
+  addDays,
+  addHours,
+  addMinutes,
+  addSeconds,
+  isPast,
+  isFuture,
+  isToday,
+  isSameDay,
+  daysDifference,
+  hoursDifference,
+  minutesDifference,
+  getAge,
+  startOfDay,
+  endOfDay,
+  isValidDate,
+  getRelativeTime,
+} from "./date.js";
 
 export { generateToken, decodeToken, verifyToken } from "./jwt.js";
 

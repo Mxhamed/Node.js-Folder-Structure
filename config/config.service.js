@@ -24,6 +24,7 @@ if (result.error) {
 
 export const APP_NAME = process.env.APP_NAME || "my_app";
 export const PORT = parseInt(process.env.PORT, 10) || 3000;
+export const TRUST_PROXY = parseInt(process.env.TRUST_PROXY, 10) || 1;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // DATABASE CONFIGURATION
@@ -59,15 +60,41 @@ export const CORS_ORIGIN = corsOriginEnv
 // RATE LIMITING
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// General API Rate Limiting
 export const RATE_LIMIT_WINDOW_MS =
-  parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 1000 * 60 * 15;
+  parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
 export const RATE_LIMIT_MAX_REQUESTS =
-  parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100;
+  parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 60;
 
+// Signup Rate Limiting
+export const SIGNUP_LIMIT_WINDOW_MS =
+  parseInt(process.env.SIGNUP_LIMIT_WINDOW_MS, 10) || 3600000;
+export const SIGNUP_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.SIGNUP_LIMIT_MAX_ATTEMPTS, 10) || 5;
+
+// Login Rate Limiting
 export const LOGIN_LIMIT_WINDOW_MS =
-  parseInt(process.env.LOGIN_LIMIT_WINDOW_MS, 10) || 1000 * 60 * 15;
+  parseInt(process.env.LOGIN_LIMIT_WINDOW_MS, 10) || 900000;
 export const LOGIN_LIMIT_MAX_ATTEMPTS =
   parseInt(process.env.LOGIN_LIMIT_MAX_ATTEMPTS, 10) || 5;
+
+// Email Verification Rate Limiting
+export const EMAIL_VERIFICATION_LIMIT_WINDOW_MS =
+  parseInt(process.env.EMAIL_VERIFICATION_LIMIT_WINDOW_MS, 10) || 3600000;
+export const EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS, 10) || 3;
+
+// Password Reset Request Rate Limiting (BOTH forgot-password AND update-password)
+export const PASSWORD_RESET_LIMIT_WINDOW_MS =
+  parseInt(process.env.PASSWORD_RESET_LIMIT_WINDOW_MS, 10) || 3600000;
+export const PASSWORD_RESET_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.PASSWORD_RESET_LIMIT_MAX_ATTEMPTS, 10) || 3;
+
+// Verify Password Reset Rate Limiting (verify-password-reset)
+export const VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS =
+  parseInt(process.env.VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS, 10) || 3600000;
+export const VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS, 10) || 10;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ENCRYPTION

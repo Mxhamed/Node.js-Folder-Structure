@@ -1,6 +1,7 @@
+import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { BadRequestError } from "./AppError.js";
-import { ERROR_MESSAGES, TOKEN_TYPES } from "../constants/index.js";
+import { ERROR_MESSAGES, TOKEN_TYPES, USER_ROLES } from "../constants/index.js";
 import {
   JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRES_IN,
@@ -79,6 +80,34 @@ export const verifyToken = (token, type = TOKEN_TYPES.ACCESS) => {
  */
 export const decodeToken = (token) => {
   return jwt.decode(token);
+};
+
+/**
+ * Generate Access AND Refresh Tokens for a User
+ * @param {string} userId - User ID
+ * @param {string} role - User role
+ * @returns {Object} { accessToken, refreshToken, jti }
+ */
+export const generateAuthTokens = (userId, role = USER_ROLES.USER) => {
+  const jti = randomUUID();
+
+  const basePayload = {
+    sub: userId,
+    jti,
+  };
+
+  const accessToken = generateToken(
+    { ...basePayload, role },
+    TOKEN_TYPES.ACCESS,
+  );
+
+  const refreshToken = generateToken(basePayload, TOKEN_TYPES.REFRESH);
+
+  return {
+    accessToken,
+    refreshToken,
+    jti,
+  };
 };
 
 /**

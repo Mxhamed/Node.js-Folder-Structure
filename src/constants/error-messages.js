@@ -5,12 +5,17 @@
 export const ERROR_MESSAGES = {
   // Rate Limiting
   RATE_LIMIT_EXCEEDED: "Too Many Requests - Please Try Again Later",
-  LOGIN_RATE_LIMIT_EXCEEDED: "Too Many Login Attempts - Please Try Again Later",
+  SIGNUP_LIMIT_EXCEEDED: "Too Many Signup Attempts - Please Try Again Later",
+  LOGIN_LIMIT_EXCEEDED: "Too Many Login Attempts - Please Try Again Later",
+  EMAIL_VERIFICATION_LIMIT_EXCEEDED:
+    "Too Many Verification Email Requests - Please Try Again Later",
+  PASSWORD_RESET_LIMIT_EXCEEDED:
+    "Too Many Password Reset Attempts - Please Try Again Later",
 
   // Authentication & Authorization
   UNAUTHORIZED: "Authentication Required",
   INVALID_CREDENTIALS: "Invalid Email or Password",
-  NO_TOKEN: "NO Authentication Token Provided",
+  NO_TOKEN: "No Authentication Token Provided",
   INVALID_AUTH_HEADER:
     "Invalid Authorization Header Format. Use: Bearer <token>",
   INVALID_TOKEN: "Invalid Token",
