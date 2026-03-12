@@ -1,6 +1,9 @@
-import { verifyToken } from "../utils/index.js";
 import { ERROR_MESSAGES, TOKEN_TYPES } from "../constants/index.js";
-import { UnauthorizedError, ForbiddenError } from "../utils/index.js";
+import {
+  UnauthorizedError,
+  ForbiddenError,
+  verifyToken,
+} from "../utils/index.js";
 
 /**
  * Authenticate User via JWT

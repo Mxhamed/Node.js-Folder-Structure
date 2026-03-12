@@ -1,5 +1,5 @@
-import { ValidationError } from "../utils/index.js";
 import { ERROR_MESSAGES } from "../constants/index.js";
+import { ValidationError } from "../utils/index.js";
 
 /**
  * Validate Request Body against Joi Schema

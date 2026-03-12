@@ -9,11 +9,11 @@ import {
   EMAIL_VERIFICATION_LIMIT_WINDOW_MS,
   PASSWORD_RESET_LIMIT_WINDOW_MS,
   PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
-  APP_NAME,
   VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS,
   VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
+  APP_NAME,
 } from "../../config/config.service.js";
-import { ERROR_MESSAGES } from "./error-messages.js";
+import { ERROR_MESSAGES } from "./index.js";
 
 /**
  * Rate Limiter Identifiers

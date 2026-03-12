@@ -1,5 +1,5 @@
-import { User } from "../../database/index.js";
 import { ERROR_MESSAGES } from "../../constants/index.js";
+import { User } from "../../database/index.js";
 import {
   generateToken,
   ConflictError,

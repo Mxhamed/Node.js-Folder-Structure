@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { CRYPTO_KEY } from "../../config/config.service.js";
-import { InternalServerError, BadRequestError } from "./AppError.js";
+import { InternalServerError, BadRequestError } from "./index.js";
 
 const CRYPTO_ALGORITHM = "aes-256-gcm";
 

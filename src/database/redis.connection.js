@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { REDIS_URL, IS_DEVELOPMENT } from "../../config/config.service.js";
+import { REDIS_URL } from "../../config/config.service.js";
 
 /**
  * Redis Client Instance

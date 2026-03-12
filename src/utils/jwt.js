@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
-import { BadRequestError } from "./AppError.js";
-import { ERROR_MESSAGES, TOKEN_TYPES, USER_ROLES } from "../constants/index.js";
 import {
   JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_SECRET,
   JWT_REFRESH_EXPIRES_IN,
 } from "../../config/config.service.js";
+import { ERROR_MESSAGES, TOKEN_TYPES, USER_ROLES } from "../constants/index.js";
+import { BadRequestError } from "./index.js";
 
 /**
  * Generate JWT

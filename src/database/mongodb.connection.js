@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { ALL_MODELS } from "./models/index.js";
 import {
   DB_URI,
   APP_NAME,
   IS_DEVELOPMENT,
 } from "../../config/config.service.js";
+import { ALL_MODELS } from "./index.js";
 
 /**
  * Connect to MongoDB Database
@@ -24,9 +24,6 @@ export const connectToMongoDB = async () => {
     });
 
     console.log(`🍃  Connected to MongoDB Successfully!`);
-    console.log(
-      `📦  Database: ${APP_NAME || mongoose.connection.db.databaseName}`,
-    );
 
     // Sync Indexes Only in Development
     if (IS_DEVELOPMENT) await syncIndexes();

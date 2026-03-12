@@ -1,11 +1,11 @@
 import argon2 from "argon2";
-import { BadRequestError } from "./AppError.js";
 import {
   ARGON2_HASH_LENGTH,
   ARGON2_TIME_COST,
   ARGON2_MEMORY_COST,
   ARGON2_PARALLELISM,
 } from "../../config/config.service.js";
+import { BadRequestError } from "./index.js";
 
 /**
  * Centralized Configuration Object

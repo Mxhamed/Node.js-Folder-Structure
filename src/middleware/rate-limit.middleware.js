@@ -1,7 +1,7 @@
 import { RedisStore } from "rate-limit-redis";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
-import { TooManyRequestsError } from "../utils/index.js";
 import { RATE_LIMITER_CONFIGS } from "../constants/index.js";
+import { TooManyRequestsError } from "../utils/index.js";
 
 let redis = null;
 const limiters = {};
