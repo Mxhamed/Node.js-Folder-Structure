@@ -3,15 +3,6 @@
  * Centralized for Consistency
  */
 export const ERROR_MESSAGES = {
-  // Rate Limiting
-  RATE_LIMIT_EXCEEDED: "Too Many Requests - Please Try Again Later",
-  SIGNUP_LIMIT_EXCEEDED: "Too Many Signup Attempts - Please Try Again Later",
-  LOGIN_LIMIT_EXCEEDED: "Too Many Login Attempts - Please Try Again Later",
-  EMAIL_VERIFICATION_LIMIT_EXCEEDED:
-    "Too Many Verification Email Requests - Please Try Again Later",
-  PASSWORD_RESET_LIMIT_EXCEEDED:
-    "Too Many Password Reset Attempts - Please Try Again Later",
-
   // Authentication & Authorization
   UNAUTHORIZED: "Authentication Required",
   INVALID_CREDENTIALS: "Invalid Email or Password",
@@ -38,4 +29,5 @@ export const ERROR_MESSAGES = {
   RESOURCE_NOT_FOUND: "Resource NOT Found",
   RESOURCE_ALREADY_EXISTS: "Resource ALREADY Exists",
   PAYLOAD_TOO_LARGE: "Request Payload is TOO Large",
+  RATE_LIMIT_EXCEEDED: "Too Many Requests - Please Try Again Later",
 };

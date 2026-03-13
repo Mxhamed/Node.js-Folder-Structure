@@ -1,7 +1,12 @@
 import { RedisStore } from "rate-limit-redis";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { RATE_LIMITER_CONFIGS } from "../constants/index.js";
-import { TooManyRequestsError } from "../utils/index.js";
+import {
+  InternalServerError,
+  NotFoundError,
+  ServiceUnavailableError,
+  TooManyRequestsError,
+} from "../utils/index.js";
 
 let redis = null;
 const limiters = {};
@@ -20,41 +25,54 @@ const limiters = {};
  */
 export const initializeRateLimiters = (redisClient) => {
   if (!redisClient) {
-    throw new Error("Redis Client is Required to Initialize Rate Limiters");
+    throw new InternalServerError(
+      "Redis Client is Required to Initialize Rate Limiters",
+    );
   }
 
   redis = redisClient;
 
-  // Create ALL Limiters from Configuration
-  Object.entries(RATE_LIMITER_CONFIGS).forEach(([name, config]) => {
-    limiters[name] = createLimiter(name, config);
+  const configs = Object.entries(RATE_LIMITER_CONFIGS);
+  const successful = [];
+  const failed = [];
+
+  // Create ALL Limiters from Configuration with Error Tracking
+  configs.forEach(([name, config]) => {
+    try {
+      limiters[name] = createLimiter(name, config);
+      successful.push(name);
+    } catch (error) {
+      failed.push({ name, error: error.message });
+      console.error(
+        `⛔  Failed to Initialize "${name}" Rate Limiter:`,
+        error.message,
+      );
+    }
   });
 
-  console.log(`🚦  ${Object.keys(limiters).length} Rate Limiters Initialized`);
-  return limiters;
-};
+  const total = configs.length;
+  const successCount = successful.length;
+  const failCount = failed.length;
 
-/**
- * Get a Rate Limiter by Name
- * Use this in Route Handlers to Apply Specific Rate Limiting
- *
- * @param {string} name - Rate Limiter Name (from RATE_LIMITER_NAMES)
- * @returns {Function} Express Rate Limiter Middleware
- * @throws {Error} If Rate Limiter with Given Name DOESN'T Exist
- *
- * @example
- * router.post("/login", getLimiter(RATE_LIMITER_NAMES.LOGIN), loginController);
- */
-export const getLimiter = (name) => {
-  const limiter = limiters[name];
-
-  if (!limiter) {
-    throw new Error(
-      `Rate Limiter "${name}" NOT Found. Available Limiters: ${Object.keys(limiters).join(", ")}`,
+  // Summary Message
+  if (successCount === total) {
+    console.log(
+      `🚦  ALL Rate Limiters Initialized Successfully (${total} Limiter${total !== 1 ? "s" : ""})`,
+    );
+  } else if (successCount > 0 && failCount > 0) {
+    console.log(
+      `⚠️  Rate Limiters Initialized: ${successCount} Successful, ${failCount} Failed`,
+    );
+  } else if (failCount === total) {
+    console.log(
+      `⛔  ALL Rate Limiters Failed to Initialize (${total} Limiter${total !== 1 ? "s" : ""})`,
+    );
+    throw new ServiceUnavailableError(
+      `Failed to Initialize ANY Rate Limiters: ${failed.map((f) => f.name).join(", ")}`,
     );
   }
 
-  return limiter;
+  return limiters;
 };
 
 /**
@@ -67,7 +85,7 @@ export const getLimiter = (name) => {
  */
 function createLimiter(name, config) {
   if (!redis) {
-    throw new Error(
+    throw new InternalServerError(
       `Redis Client NOT Initialized! Cannot Create "${name}" Rate Limiter`,
     );
   }
@@ -92,6 +110,19 @@ function createLimiter(name, config) {
       throw new TooManyRequestsError(config.message);
     },
   });
+}
+
+/**
+ * Secure Key Generator that Handles IPv6 Properly
+ * Uses express-rate-limit's Built-In IPv6 Normalization
+ * @private
+ *
+ * @param {Object} req - Express Request Object
+ * @returns {string} Normalized IP Address for Rate Limiting
+ */
+function secureKeyGenerator(req) {
+  const ip = getClientIp(req);
+  return ipKeyGenerator(ip); // Handles IPv6 Normalization
 }
 
 /**
@@ -129,14 +160,24 @@ function getClientIp(req) {
 }
 
 /**
- * Secure Key Generator that Handles IPv6 Properly
- * Uses express-rate-limit's Built-In IPv6 Normalization
- * @private
+ * Get a Rate Limiter by Name
+ * Use this in Route Handlers to Apply Specific Rate Limiting
  *
- * @param {Object} req - Express Request Object
- * @returns {string} Normalized IP Address for Rate Limiting
+ * @param {string} name - Rate Limiter Name (from RATE_LIMITER_NAMES)
+ * @returns {Function} Express Rate Limiter Middleware
+ * @throws {Error} If Rate Limiter with Given Name DOESN'T Exist
+ *
+ * @example
+ * router.post("/login", getLimiter(RATE_LIMITER_NAMES.LOGIN), loginController);
  */
-function secureKeyGenerator(req) {
-  const ip = getClientIp(req);
-  return ipKeyGenerator(ip); // Handles IPv6 Normalization
-}
+export const getLimiter = (name) => {
+  const limiter = limiters[name];
+
+  if (!limiter) {
+    throw new NotFoundError(
+      `Rate Limiter "${name}" NOT Found. Available Limiters: ${Object.keys(limiters).join(", ")}`,
+    );
+  }
+
+  return limiter;
+};

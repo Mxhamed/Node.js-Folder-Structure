@@ -1,19 +1,15 @@
 export {
-  default as AppError,
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  PayloadTooLargeError,
-  ValidationError,
-  TooManyRequestsError,
-  InternalServerError,
-  ServiceUnavailableError,
-  GatewayTimeoutError,
-} from "./AppError.js";
-
-export { encrypt, decrypt } from "./crypto.js";
+  generateJTI,
+  generateOTP,
+  generateSlug,
+  toSnakeCase,
+  toCamelCase,
+  toTitleCase,
+  maskEmail,
+  maskPhone,
+  truncate,
+  buildRedisKey,
+} from "./string.js";
 
 export {
   formatDate,
@@ -39,8 +35,27 @@ export {
   getRelativeTime,
 } from "./date.js";
 
-export { generateToken, decodeToken, verifyToken } from "./jwt.js";
+export {
+  default as AppError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  PayloadTooLargeError,
+  ValidationError,
+  TooManyRequestsError,
+  InternalServerError,
+  ServiceUnavailableError,
+  GatewayTimeoutError,
+} from "./AppError.js";
+
+export { sendSuccess, sendError, sendPaginated } from "./response.js";
+
+export { encrypt, decrypt } from "./crypto.js";
 
 export { hashPassword, verifyPassword } from "./password.js";
 
-export { sendSuccess, sendError, sendPaginated } from "./response.js";
+export { generateToken, decodeToken, verifyToken } from "./jwt.js";
+
+export { connectToSMTP, composeMail, sendMail } from "./mailer.js";

@@ -22,7 +22,7 @@ export const connectToRedis = async () => {
 
   try {
     await redis.connect();
-    console.log("🏮  Connected to Redis Successfully!");
+    console.log("🏮  Connected to Redis Successfully");
 
     // Setup Event Listeners
     setupRedisListeners();

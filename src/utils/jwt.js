@@ -1,13 +1,36 @@
-import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import {
   JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_SECRET,
   JWT_REFRESH_EXPIRES_IN,
+  JWT_ACTION_SECRET,
+  JWT_ACTION_EXPIRES_IN,
 } from "../../config/config.service.js";
 import { ERROR_MESSAGES, TOKEN_TYPES, USER_ROLES } from "../constants/index.js";
-import { BadRequestError } from "./index.js";
+import { BadRequestError, generateJTI } from "./index.js";
+
+/**
+ * Get Token Configuration Based on Type
+ * @param {string} type - Token Type from TOKEN_TYPES
+ * @returns {Object} { secret, expiresIn }
+ * @private
+ */
+function getTokenConfig(type) {
+  switch (type) {
+    case TOKEN_TYPES.ACCESS:
+      return { secret: JWT_ACCESS_SECRET, expiresIn: JWT_ACCESS_EXPIRES_IN };
+    case TOKEN_TYPES.REFRESH:
+      return { secret: JWT_REFRESH_SECRET, expiresIn: JWT_REFRESH_EXPIRES_IN };
+    case TOKEN_TYPES.EMAIL_VERIFICATION:
+    case TOKEN_TYPES.PASSWORD_RESET:
+      return { secret: JWT_ACTION_SECRET, expiresIn: JWT_ACTION_EXPIRES_IN };
+    default:
+      throw new BadRequestError(
+        `${ERROR_MESSAGES.INVALID_TOKEN_TYPE}: ${type}`,
+      );
+  }
+}
 
 /**
  * Generate JWT
@@ -29,6 +52,34 @@ export const generateToken = (payload, type = TOKEN_TYPES.ACCESS) => {
   };
 
   return jwt.sign(tokenPayload, secret, { expiresIn });
+};
+
+/**
+ * Generate Access AND Refresh Tokens for a User
+ * @param {string} userId - User ID
+ * @param {string} role - User role
+ * @returns {Object} { accessToken, refreshToken, jti }
+ */
+export const generateAuthTokens = (userId, role = USER_ROLES.USER) => {
+  const jti = generateJTI();
+
+  const basePayload = {
+    sub: userId,
+    jti,
+  };
+
+  const accessToken = generateToken(
+    { ...basePayload, role },
+    TOKEN_TYPES.ACCESS,
+  );
+
+  const refreshToken = generateToken(basePayload, TOKEN_TYPES.REFRESH);
+
+  return {
+    accessToken,
+    refreshToken,
+    jti,
+  };
 };
 
 /**
@@ -58,11 +109,13 @@ export const verifyToken = (token, type = TOKEN_TYPES.ACCESS) => {
     return decoded;
   } catch (error) {
     // Handle JWT-Specific Errors
-    if (error instanceof jwt.TokenExpiredError)
+    if (error instanceof jwt.TokenExpiredError) {
       throw new UnauthorizedError(ERROR_MESSAGES.EXPIRED_TOKEN);
+    }
 
-    if (error instanceof jwt.JsonWebTokenError)
+    if (error instanceof jwt.JsonWebTokenError) {
       throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
+    }
 
     // Re-Throw If It's ALREADY Our Custom Error
     if (error instanceof BadRequestError) throw error;
@@ -81,50 +134,3 @@ export const verifyToken = (token, type = TOKEN_TYPES.ACCESS) => {
 export const decodeToken = (token) => {
   return jwt.decode(token);
 };
-
-/**
- * Generate Access AND Refresh Tokens for a User
- * @param {string} userId - User ID
- * @param {string} role - User role
- * @returns {Object} { accessToken, refreshToken, jti }
- */
-export const generateAuthTokens = (userId, role = USER_ROLES.USER) => {
-  const jti = randomUUID();
-
-  const basePayload = {
-    sub: userId,
-    jti,
-  };
-
-  const accessToken = generateToken(
-    { ...basePayload, role },
-    TOKEN_TYPES.ACCESS,
-  );
-
-  const refreshToken = generateToken(basePayload, TOKEN_TYPES.REFRESH);
-
-  return {
-    accessToken,
-    refreshToken,
-    jti,
-  };
-};
-
-/**
- * Get Token Configuration Based on Type
- * @param {string} type - Token Type from TOKEN_TYPES
- * @returns {Object} { secret, expiresIn }
- * @private
- */
-function getTokenConfig(type) {
-  switch (type) {
-    case TOKEN_TYPES.ACCESS:
-      return { secret: JWT_ACCESS_SECRET, expiresIn: JWT_ACCESS_EXPIRES_IN };
-    case TOKEN_TYPES.REFRESH:
-      return { secret: JWT_REFRESH_SECRET, expiresIn: JWT_REFRESH_EXPIRES_IN };
-    default:
-      throw new BadRequestError(
-        `${ERROR_MESSAGES.INVALID_TOKEN_TYPE}: ${type}`,
-      );
-  }
-}

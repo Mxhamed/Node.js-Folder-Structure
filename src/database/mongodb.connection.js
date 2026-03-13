@@ -23,7 +23,7 @@ export const connectToMongoDB = async () => {
       dbName: APP_NAME,
     });
 
-    console.log(`🍃  Connected to MongoDB Successfully!`);
+    console.log(`🍃  Connected to MongoDB Successfully`);
 
     // Sync Indexes Only in Development
     if (IS_DEVELOPMENT) await syncIndexes();
@@ -49,16 +49,30 @@ async function syncIndexes() {
       }),
     );
 
+    const successful = results.filter((r) => r.status === "fulfilled").length;
+    const failed = results.filter((r) => r.status === "rejected").length;
+    const total = results.length;
+
+    // Calculate Total Indexes Synced
+    let totalIndexesSynced = 0;
     results.forEach((result) => {
-      if (result.status === "fulfilled") {
-        console.log(`🔄  Indexes Synced for ${result.value}`);
-      } else {
-        console.error(
-          `⛔  Index Sync Failed for Model:`,
-          result.reason.message,
-        );
-      }
+      if (result.status === "fulfilled") totalIndexesSynced++;
     });
+
+    // Summary Message
+    if (successful === total) {
+      console.log(
+        `📇  ALL Indexes Synced Successfully (${total} Model${total !== 1 ? "s" : ""})`,
+      );
+    } else if (successful > 0 && failed > 0) {
+      console.log(
+        `⚠️  Indexes Synced: ${successful} Successful, ${failed} Failed`,
+      );
+    } else if (failed === total) {
+      console.log(
+        `⛔  ALL Index Syncs Failed (${total} Model${total !== 1 ? "s" : ""})`,
+      );
+    }
   } catch (error) {
     console.error("⛔  Index Sync Failed:", error.message);
   }

@@ -37,8 +37,9 @@ export const hashPassword = async (password) => {
  * @returns {Promise<boolean>} True If Password Matches
  */
 export const verifyPassword = async (password, hash) => {
-  if (!password || !hash)
+  if (!password || !hash) {
     throw new BadRequestError("Password and Hash are Required");
+  }
 
   try {
     return await argon2.verify(hash, password);

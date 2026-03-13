@@ -17,8 +17,9 @@ export const authenticate = (tokenType = TOKEN_TYPES.ACCESS) => {
 
     if (!authHeader) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
 
-    if (!authHeader.startsWith("Bearer "))
+    if (!authHeader.startsWith("Bearer ")) {
       throw new UnauthorizedError(ERROR_MESSAGES.INVALID_AUTH_HEADER);
+    }
 
     const token = authHeader.split(" ")[1];
 
@@ -47,8 +48,9 @@ export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) throw new UnauthorizedError(ERROR_MESSAGES.UNAUTHORIZED);
 
-    if (!roles.includes(req.user.role))
+    if (!roles.includes(req.user.role)) {
       throw new ForbiddenError(ERROR_MESSAGES.FORBIDDEN);
+    }
 
     next();
   };

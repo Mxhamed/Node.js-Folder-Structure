@@ -23,9 +23,9 @@ export const RATE_LIMITER_NAMES = {
   API: "api",
   SIGNUP: "signup",
   LOGIN: "login",
-  EMAIL_VERIFICATION: "emailVerification",
-  PASSWORD_RESET: "passwordReset",
-  VERIFY_PASSWORD_RESET: "verifyPasswordReset",
+  EMAIL_VERIFICATION: "email-verification",
+  PASSWORD_RESET: "password-reset",
+  VERIFY_PASSWORD_RESET: "verify-password-reset",
 };
 
 /**
@@ -62,7 +62,7 @@ export const RATE_LIMITER_CONFIGS = {
     windowMs: SIGNUP_LIMIT_WINDOW_MS,
     limit: SIGNUP_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:signup:`,
-    message: ERROR_MESSAGES.SIGNUP_LIMIT_EXCEEDED,
+    message: "Too Many Signup Attempts - Please Try Again Later",
     skipSuccessfulRequests: false,
   },
 
@@ -75,7 +75,7 @@ export const RATE_LIMITER_CONFIGS = {
     windowMs: LOGIN_LIMIT_WINDOW_MS,
     limit: LOGIN_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:login:`,
-    message: ERROR_MESSAGES.LOGIN_LIMIT_EXCEEDED,
+    message: "Too Many Login Attempts - Please Try Again Later",
     skipSuccessfulRequests: true,
   },
 
@@ -88,7 +88,7 @@ export const RATE_LIMITER_CONFIGS = {
     windowMs: EMAIL_VERIFICATION_LIMIT_WINDOW_MS,
     limit: EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:email-verification:`,
-    message: ERROR_MESSAGES.EMAIL_VERIFICATION_LIMIT_EXCEEDED,
+    message: "Too Many Verification Email Requests - Please Try Again Later",
     skipSuccessfulRequests: false,
   },
 
@@ -102,7 +102,7 @@ export const RATE_LIMITER_CONFIGS = {
     windowMs: PASSWORD_RESET_LIMIT_WINDOW_MS,
     limit: PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:password-reset:`,
-    message: ERROR_MESSAGES.PASSWORD_RESET_LIMIT_EXCEEDED,
+    message: "Too Many Password Reset Requests - Please Try Again Later",
     skipSuccessfulRequests: false,
   },
 
@@ -115,7 +115,7 @@ export const RATE_LIMITER_CONFIGS = {
     windowMs: VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS,
     limit: VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:verify-password-reset:`,
-    message: ERROR_MESSAGES.PASSWORD_RESET_LIMIT_EXCEEDED,
+    message: "Too Many Password Reset Attempts - Please Try Again Later",
     skipSuccessfulRequests: true,
   },
 };

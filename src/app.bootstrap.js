@@ -13,7 +13,12 @@ import { ERROR_MESSAGES, HTTP_STATUS } from "./constants/index.js";
 import { connectToMongoDB, connectToRedis, redis } from "./database/index.js";
 import { initializeRateLimiters } from "./middleware/index.js";
 // import { usersRouter } from "./modules/index.js";
-import { sendError, NotFoundError } from "./utils/index.js";
+import {
+  sendError,
+  NotFoundError,
+  connectToSMTP,
+  toTitleCase,
+} from "./utils/index.js";
 
 // CORS Configuration
 const corsOptions = {
@@ -29,8 +34,11 @@ export default async function bootstrap() {
   app.set("trust proxy", TRUST_PROXY);
 
   // Database Connection
-  // await connectToMongoDB();
+  await connectToMongoDB();
   await connectToRedis();
+
+  // SMTP Server Connection
+  await connectToSMTP();
 
   // Security Middleware
   app.use(helmet());
@@ -85,11 +93,40 @@ export default async function bootstrap() {
   });
 
   // Start Server
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
+    const protocol = IS_DEVELOPMENT ? "http" : "https";
+    const host = formatServerHost(server.address());
+    const baseUrl = `${protocol}://${host}:${PORT}`;
+
     console.log(`🚀  Server Running on Port ${PORT}`);
-    console.log(`🌍  Environment: ${NODE_ENV}`);
-    console.log(`🩺  Health Check: http://localhost:${PORT}/health`);
+    console.log(`🌍  Environment: ${toTitleCase(NODE_ENV)}`);
+    console.log(`🩺  Health Check: ${baseUrl}/health`);
   });
 
   return app;
+}
+
+/**
+ * Formats a Server Address Object into a Human-Readable Host String
+ * @param {object|string} address - The server.address() Result
+ * @returns {string} Formatted Host String
+ */
+function formatServerHost(address) {
+  // Default Fallback
+  if (!address) return "localhost";
+
+  // Handle Unix Domain Sockets or Pipes
+  if (typeof address === "string") return address;
+
+  // Handle TCP Server Addresses
+  const { address: ipAddress } = address;
+
+  // Listening on ALL Interfaces
+  if (ipAddress === "::" || ipAddress === "0.0.0.0") return "localhost";
+
+  // IPv6 Address - Wrap in Brackets for URL Compatibility
+  if (ipAddress.includes(":")) return `[${ipAddress}]`;
+
+  // IPv4 Address
+  return ipAddress;
 }

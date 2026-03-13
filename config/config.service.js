@@ -38,8 +38,17 @@ export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 // Validate Critical Database Config
 if (!DB_URI) throw new Error("DB_URI is Required in Environment Variables");
-if (!REDIS_URL)
+
+if (!REDIS_URL) {
   throw new Error("REDIS_URL is Required in Environment Variables");
+}
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// NODEMAILER CONFIGURATION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+export const SMTP_USER = process.env.SMTP_USER;
+export const SMTP_PASS = process.env.SMTP_PASS;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // REQUEST CONFIGURATION
@@ -105,8 +114,9 @@ export const CRYPTO_KEY = process.env.CRYPTO_KEY
   : null;
 
 // Validate Encryption Key
-if (!CRYPTO_KEY || CRYPTO_KEY.length !== 32)
+if (!CRYPTO_KEY || CRYPTO_KEY.length !== 32) {
   throw new Error("CRYPTO_KEY MUST be a 32-Byte Hex String (64 Characters)");
+}
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PASSWORD HASHING
@@ -137,21 +147,27 @@ if (ARGON2_MEMORY_COST < 32768)
 // JWT CONFIGURATION
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// Access Token
+// Access Token (Short-Lived, for API Requests)
 export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 export const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
 
-// Refresh Token
+// Refresh Token (Long-Lived, for Getting New Access Tokens)
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 export const JWT_REFRESH_EXPIRES_IN =
   process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
-// Validate JWT Secrets
-if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET)
-  throw new Error("JWT_ACCESS_SECRET and JWT_REFRESH_SECRET are Required");
+// Action Tokens (Short-Lived, Single-Use, for Sensitive Operations)
+export const JWT_ACTION_SECRET = process.env.JWT_ACTION_SECRET;
+export const JWT_ACTION_EXPIRES_IN = process.env.JWT_ACTION_EXPIRES_IN || "15m";
 
-if (JWT_ACCESS_SECRET === JWT_REFRESH_SECRET)
+// Validate JWT Secrets
+if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET || !JWT_ACTION_SECRET) {
+  throw new Error("JWT Secrets are Required");
+}
+
+if (JWT_ACCESS_SECRET === JWT_REFRESH_SECRET) {
   console.warn("⚠️  Warning: Access and Refresh Secrets SHOULD be Different!");
+}
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // LOGGING

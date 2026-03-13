@@ -5,4 +5,6 @@
 export const TOKEN_TYPES = {
   ACCESS: "access",
   REFRESH: "refresh",
+  EMAIL_VERIFICATION: "email-verification",
+  PASSWORD_RESET: "password-reset",
 };

@@ -36,13 +36,15 @@ export const encrypt = (plainData) => {
  * @returns {string} Original Plain Text
  */
 export const decrypt = (encryptedData) => {
-  if (!encryptedData || typeof encryptedData !== "string")
+  if (!encryptedData || typeof encryptedData !== "string") {
     throw new BadRequestError("Invalid Encrypted Data");
+  }
 
   const parts = encryptedData.split(":");
 
-  if (parts.length !== 3)
+  if (parts.length !== 3) {
     throw new BadRequestError("Invalid Encrypted Data Format");
+  }
 
   const [ivHex, encrypted, authTagHex] = parts;
 
