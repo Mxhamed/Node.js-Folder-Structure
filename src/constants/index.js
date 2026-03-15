@@ -6,6 +6,8 @@ export { ERROR_MESSAGES } from "./error-messages.js";
 
 export { TOKEN_TYPES } from "./token-types.js";
 
+export { REDIS_KEYS } from "./redis-keys.js";
+
 export { RATE_LIMITER_NAMES, RATE_LIMITER_CONFIGS } from "./rate-limit.js";
 
 // export {

@@ -1,4 +1,5 @@
-import { ERROR_MESSAGES, TOKEN_TYPES } from "../constants/index.js";
+import { ERROR_MESSAGES, REDIS_KEYS, TOKEN_TYPES } from "../constants/index.js";
+import { redis, User } from "../database/index.js";
 import {
   UnauthorizedError,
   ForbiddenError,
@@ -6,35 +7,60 @@ import {
 } from "../utils/index.js";
 
 /**
- * Authenticate User via JWT
- * Expects: Authorization: Bearer <token>
- * @param {string} tokenType - Type of Token to Verify (Default: ACCESS)
- * @returns {Function} Express Middleware
+ * Authentication Middleware
+ * Verifies the Access Token from the Authorization Header,
+ * Checks Against Token Blacklist and Global Logout Timestamp,
+ * then Attaches the Decoded Token and User to the Request Object
+ *
+ * @middleware
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ *
+ * @throws {UnauthorizedError} If Token is Missing, Invalid, Expired, or Revoked
+ *
+ * @example
+ * router.get("/profile", authenticate, getProfile);
  */
-export const authenticate = (tokenType = TOKEN_TYPES.ACCESS) => {
-  return async (req, res, next) => {
-    const authHeader = req.headers.authorization;
+export const authenticate = async (req, res, next) => {
+  // Check Authorization Header
+  const authHeader = req.headers.authorization;
+  if (!authHeader) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
+  if (!authHeader.startsWith("Bearer ")) {
+    throw new UnauthorizedError(ERROR_MESSAGES.INVALID_AUTH_HEADER);
+  }
 
-    if (!authHeader) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
+  // Extract Token
+  const token = authHeader.split(" ")[1];
+  if (!token) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
 
-    if (!authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedError(ERROR_MESSAGES.INVALID_AUTH_HEADER);
+  // Verify Token Signature & Expiry
+  const decodedToken = verifyToken(token, TOKEN_TYPES.ACCESS);
+  const { sub, iat, jti } = decodedToken;
+
+  // Check If User Exists
+  const user = await User.findById(sub).select("-password").lean().exec();
+  if (!user) throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
+
+  // Check Global Logout
+  if (user.globalLogoutAt) {
+    const logoutTimestamp = toUnixTimestamp(user.globalLogoutAt);
+
+    if (iat < logoutTimestamp) {
+      throw new UnauthorizedError(ERROR_MESSAGES.REVOKED_TOKEN);
     }
+  }
 
-    const token = authHeader.split(" ")[1];
+  // Check Individual Token Blacklist
+  const blacklistKey = REDIS_KEYS.TOKEN_BLACKLIST(sub, jti);
+  const isBlacklisted = await redis.get(blacklistKey);
+  if (isBlacklisted) throw new UnauthorizedError(ERROR_MESSAGES.REVOKED_TOKEN);
 
-    if (!token) throw new UnauthorizedError(ERROR_MESSAGES.NO_TOKEN);
+  // Attach User and Token to Request
+  req.token = decodedToken;
+  req.user = user;
 
-    try {
-      const decoded = verifyToken(token, tokenType);
-      req.user = decoded;
-      next();
-    } catch (error) {
-      throw new UnauthorizedError(
-        error.message || ERROR_MESSAGES.INVALID_TOKEN,
-      );
-    }
-  };
+  next();
 };
 
 /**

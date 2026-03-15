@@ -33,20 +33,12 @@ export default async function bootstrap() {
   const app = express();
   app.set("trust proxy", TRUST_PROXY);
 
-  // Database Connection
-  await connectToMongoDB();
-  await connectToRedis();
-
-  // SMTP Server Connection
-  await connectToSMTP();
+  // Database & SMTP Server Connection
+  await Promise.all([connectToMongoDB(), connectToRedis(), connectToSMTP()]);
 
   // Security Middleware
   app.use(helmet());
   app.use(cors(corsOptions));
-
-  // Body Parsing Middleware
-  app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
-  app.use(express.urlencoded({ extended: true, limit: REQUEST_BODY_LIMIT }));
 
   // Health Check
   app.get("/health", (req, res) => {
@@ -56,6 +48,10 @@ export default async function bootstrap() {
       timestamp: new Date().toISOString(),
     });
   });
+
+  // Body Parsing Middleware
+  app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
+  app.use(express.urlencoded({ extended: true, limit: REQUEST_BODY_LIMIT }));
 
   // Rate Limiting
   const { api: rateLimiter } = initializeRateLimiters(redis);

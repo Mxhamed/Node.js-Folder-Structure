@@ -9,6 +9,7 @@ export const ERROR_MESSAGES = {
   NO_TOKEN: "No Authentication Token Provided",
   INVALID_AUTH_HEADER:
     "Invalid Authorization Header Format. Use: Bearer <token>",
+  REVOKED_TOKEN: "Token has been Revoked",
   INVALID_TOKEN: "Invalid Token",
   EXPIRED_TOKEN: "Token has Expired",
   INVALID_TOKEN_TYPE: "Invalid Token Type",

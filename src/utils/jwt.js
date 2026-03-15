@@ -8,7 +8,7 @@ import {
   JWT_ACTION_EXPIRES_IN,
 } from "../../config/config.service.js";
 import { ERROR_MESSAGES, TOKEN_TYPES, USER_ROLES } from "../constants/index.js";
-import { BadRequestError, generateJTI } from "./index.js";
+import { BadRequestError, generateJTI, UnauthorizedError } from "./index.js";
 
 /**
  * Get Token Configuration Based on Type

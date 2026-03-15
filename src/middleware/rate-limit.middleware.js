@@ -3,7 +3,6 @@ import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { RATE_LIMITER_CONFIGS } from "../constants/index.js";
 import {
   InternalServerError,
-  NotFoundError,
   ServiceUnavailableError,
   TooManyRequestsError,
 } from "../utils/index.js";
@@ -174,7 +173,7 @@ export const getLimiter = (name) => {
   const limiter = limiters[name];
 
   if (!limiter) {
-    throw new NotFoundError(
+    throw new InternalServerError(
       `Rate Limiter "${name}" NOT Found. Available Limiters: ${Object.keys(limiters).join(", ")}`,
     );
   }
