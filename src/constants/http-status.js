@@ -1,6 +1,8 @@
 /**
  * HTTP Status Code Constants
  * Use these Instead of Magic Numbers throughout the App
+ *
+ * @enum {string}
  */
 export const HTTP_STATUS = {
   // Success

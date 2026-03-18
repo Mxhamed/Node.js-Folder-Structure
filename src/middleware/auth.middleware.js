@@ -68,7 +68,6 @@ export const authenticate = async (req, res, next) => {
  * @param {...string} roles - Allowed Roles
  * @returns {Function} Express Middleware
  *
- * Usage: authorize("admin", "moderator")
  */
 export const authorize = (...roles) => {
   return (req, res, next) => {

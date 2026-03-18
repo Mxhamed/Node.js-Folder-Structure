@@ -87,23 +87,23 @@ export const LOGIN_LIMIT_WINDOW_MS =
 export const LOGIN_LIMIT_MAX_ATTEMPTS =
   parseInt(process.env.LOGIN_LIMIT_MAX_ATTEMPTS, 10) || 5;
 
-// Email Verification Rate Limiting
-export const EMAIL_VERIFICATION_LIMIT_WINDOW_MS =
-  parseInt(process.env.EMAIL_VERIFICATION_LIMIT_WINDOW_MS, 10) || 3600000;
-export const EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS, 10) || 3;
+// Refresh Token Rate Limiting
+export const REFRESH_TOKEN_LIMIT_WINDOW_MS =
+  parseInt(process.env.REFRESH_TOKEN_LIMIT_WINDOW_MS, 10) || 900000;
+export const REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS, 10) || 10;
 
-// Password Reset Request Rate Limiting (BOTH forgot-password AND update-password)
-export const PASSWORD_RESET_LIMIT_WINDOW_MS =
-  parseInt(process.env.PASSWORD_RESET_LIMIT_WINDOW_MS, 10) || 3600000;
-export const PASSWORD_RESET_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.PASSWORD_RESET_LIMIT_MAX_ATTEMPTS, 10) || 3;
+// Auth Action Rate Limiting (forgot-password, request-email-verification, update-password)
+export const AUTH_ACTION_LIMIT_WINDOW_MS =
+  parseInt(process.env.AUTH_ACTION_LIMIT_WINDOW_MS, 10) || 3600000;
+export const AUTH_ACTION_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.AUTH_ACTION_LIMIT_MAX_ATTEMPTS, 10) || 3;
 
-// Verify Password Reset Rate Limiting (verify-password-reset)
-export const VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS =
-  parseInt(process.env.VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS, 10) || 3600000;
-export const VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS, 10) || 10;
+// Token Verification Rate Limiting (verify-email, verify-password-reset)
+export const TOKEN_VERIFY_LIMIT_WINDOW_MS =
+  parseInt(process.env.TOKEN_VERIFY_LIMIT_WINDOW_MS, 10) || 3600000;
+export const TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS =
+  parseInt(process.env.TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS, 10) || 10;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ENCRYPTION
@@ -156,9 +156,12 @@ export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 export const JWT_REFRESH_EXPIRES_IN =
   process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
-// Action Tokens (Short-Lived, Single-Use, for Sensitive Operations)
+// Action Tokens (Single-Use, for Sensitive Operations)
 export const JWT_ACTION_SECRET = process.env.JWT_ACTION_SECRET;
-export const JWT_ACTION_EXPIRES_IN = process.env.JWT_ACTION_EXPIRES_IN || "15m";
+export const JWT_EMAIL_VERIFICATION_EXPIRES_IN =
+  process.env.JWT_EMAIL_VERIFICATION_EXPIRES_IN || "24h";
+export const JWT_PASSWORD_RESET_EXPIRES_IN =
+  process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "15m";
 
 // Validate JWT Secrets
 if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET || !JWT_ACTION_SECRET) {

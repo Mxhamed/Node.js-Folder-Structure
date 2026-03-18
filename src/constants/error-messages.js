@@ -1,6 +1,9 @@
 /**
+ *
  * Reusable Error Messages
  * Centralized for Consistency
+ *
+ * @enum {string}
  */
 export const ERROR_MESSAGES = {
   // Authentication & Authorization
@@ -30,5 +33,5 @@ export const ERROR_MESSAGES = {
   RESOURCE_NOT_FOUND: "Resource NOT Found",
   RESOURCE_ALREADY_EXISTS: "Resource ALREADY Exists",
   PAYLOAD_TOO_LARGE: "Request Payload is TOO Large",
-  RATE_LIMIT_EXCEEDED: "Too Many Requests - Please Try Again Later",
+  RATE_LIMIT_EXCEEDED: "Too Many Requests. Please Try Again Later",
 };

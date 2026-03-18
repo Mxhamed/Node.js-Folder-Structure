@@ -1,31 +1,48 @@
 import {
-  RATE_LIMIT_MAX_REQUESTS,
+  APP_NAME,
   RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_MAX_REQUESTS,
   SIGNUP_LIMIT_WINDOW_MS,
   SIGNUP_LIMIT_MAX_ATTEMPTS,
-  LOGIN_LIMIT_MAX_ATTEMPTS,
   LOGIN_LIMIT_WINDOW_MS,
-  EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS,
-  EMAIL_VERIFICATION_LIMIT_WINDOW_MS,
-  PASSWORD_RESET_LIMIT_WINDOW_MS,
-  PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
-  VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS,
-  VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
-  APP_NAME,
+  LOGIN_LIMIT_MAX_ATTEMPTS,
+  REFRESH_TOKEN_LIMIT_WINDOW_MS,
+  REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS,
+  AUTH_ACTION_LIMIT_WINDOW_MS,
+  AUTH_ACTION_LIMIT_MAX_ATTEMPTS,
+  TOKEN_VERIFY_LIMIT_WINDOW_MS,
+  TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS,
 } from "../../config/config.service.js";
 import { ERROR_MESSAGES } from "./index.js";
 
 /**
  * Rate Limiter Identifiers
  * Use these Constants to Reference Rate Limiters throughout the App
+ *
+ * @enum {string}
  */
-export const RATE_LIMITER_NAMES = {
+export const RATE_LIMITERS = {
   API: "api",
   SIGNUP: "signup",
   LOGIN: "login",
-  EMAIL_VERIFICATION: "email-verification",
-  PASSWORD_RESET: "password-reset",
+  REFRESH_TOKEN: "refresh-token",
+  REQUEST_EMAIL_VERIFICATION: "request-email-verification",
+  VERIFY_EMAIL: "verify-email",
+  FORGOT_PASSWORD: "forgot-password",
   VERIFY_PASSWORD_RESET: "verify-password-reset",
+  UPDATE_PASSWORD: "update-password",
+};
+
+/**
+ * Rate Limiter Key Generation Strategies
+ * Determines How Clients are Identified for Rate Limiting
+ *
+ * @enum {string}
+ */
+export const LIMIT_BY = {
+  IP: "ip",
+  EMAIL: "email",
+  IP_AND_EMAIL: "ip-and-email",
 };
 
 /**
@@ -33,11 +50,12 @@ export const RATE_LIMITER_NAMES = {
  * Centralized Configuration for ALL Rate Limiters in the Application
  *
  * @typedef {Object} RateLimiterConfig
- * @property {number} windowMs - Time Window in Milliseconds
- * @property {number} limit - Maximum Requests Allowed in the Window
- * @property {string} prefix - Redis Key Prefix for this Limiter
- * @property {string} message - Error Message When Limit Exceeded
- * @property {boolean} skipSuccessfulRequests - Whether to Count Successful Requests
+ * @property {number} windowMs                - Time Window in Milliseconds
+ * @property {number} limit                   - Maximum Requests Allowed in the Window
+ * @property {string} prefix                  - Redis Key Prefix for this Limiter
+ * @property {string} message                 - Error Message When Limit is Exceeded
+ * @property {boolean} skipSuccessfulRequests - Whether to Skip Counting Successful Requests
+ * @property {string} limitBy                 - Key Generation Strategy from LIMIT_BY
  */
 export const RATE_LIMITER_CONFIGS = {
   /**
@@ -45,77 +63,133 @@ export const RATE_LIMITER_CONFIGS = {
    * Applied to ALL "/api" Routes to Prevent Abuse
    * Counts ALL Requests Regardless of Success/Failure
    */
-  [RATE_LIMITER_NAMES.API]: {
+  [RATE_LIMITERS.API]: {
     windowMs: RATE_LIMIT_WINDOW_MS,
     limit: RATE_LIMIT_MAX_REQUESTS,
     prefix: `${APP_NAME}:ratelimit:api:`,
     message: ERROR_MESSAGES.RATE_LIMIT_EXCEEDED,
     skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.IP,
   },
 
   /**
    * Signup Rate Limiter
    * Prevents Spam Account Creation
-   * Counts ALL Requests to Prevent Discovering Existing Emails
+   * Counts ALL Requests to Prevent Email Enumeration
    */
-  [RATE_LIMITER_NAMES.SIGNUP]: {
+  [RATE_LIMITERS.SIGNUP]: {
     windowMs: SIGNUP_LIMIT_WINDOW_MS,
     limit: SIGNUP_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:signup:`,
-    message: "Too Many Signup Attempts - Please Try Again Later",
+    message: "Too Many Signup Attempts from this IP. Please Try Again Later",
     skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.IP,
   },
 
   /**
    * Login Rate Limiter
    * Prevents Brute-Force Password Attacks
-   * Only Counts Failed Login Attempts
+   * Only Counts Failed Attempts to Avoid Locking Out Legitimate Users
+   * IP + Email Catches Both Distributed and Targeted Attacks
    */
-  [RATE_LIMITER_NAMES.LOGIN]: {
+  [RATE_LIMITERS.LOGIN]: {
     windowMs: LOGIN_LIMIT_WINDOW_MS,
     limit: LOGIN_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:login:`,
-    message: "Too Many Login Attempts - Please Try Again Later",
+    message: "Too Many Login Attempts. Please Wait Before Trying Again",
     skipSuccessfulRequests: true,
+    limitBy: LIMIT_BY.IP_AND_EMAIL,
   },
 
   /**
-   * Email Verification Rate Limiter
-   * Prevents Email Spam (Sending Verification Emails Costs Money)
-   * Counts ALL Requests Regardless of Success
+   * Refresh Token Rate Limiter
+   * Prevents Redis Flooding from Excessive Token Rotation
+   * IP-Only — Token Itself is the Credential, No Email in Request
+   * Counts ALL Requests
    */
-  [RATE_LIMITER_NAMES.EMAIL_VERIFICATION]: {
-    windowMs: EMAIL_VERIFICATION_LIMIT_WINDOW_MS,
-    limit: EMAIL_VERIFICATION_LIMIT_MAX_ATTEMPTS,
-    prefix: `${APP_NAME}:ratelimit:auth:email-verification:`,
-    message: "Too Many Verification Email Requests - Please Try Again Later",
+  [RATE_LIMITERS.REFRESH_TOKEN]: {
+    windowMs: REFRESH_TOKEN_LIMIT_WINDOW_MS,
+    limit: REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS,
+    prefix: `${APP_NAME}:ratelimit:auth:refresh-token:`,
+    message: "Too Many Token Refresh Attempts. Please Try Again Later",
     skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.IP,
   },
 
   /**
-   * Password Reset Request Rate Limiter
+   * Request Email Verification Rate Limiter
+   * Prevents Verification Email Spam (Emails have a Cost)
+   * Email-Only — Authenticated Endpoint, Email Available from req.user
+   * Counts ALL Requests
+   */
+  [RATE_LIMITERS.REQUEST_EMAIL_VERIFICATION]: {
+    windowMs: AUTH_ACTION_LIMIT_WINDOW_MS,
+    limit: AUTH_ACTION_LIMIT_MAX_ATTEMPTS,
+    prefix: `${APP_NAME}:ratelimit:auth:request-email-verification:`,
+    message:
+      "Too Many Verification Email Requests. Please Check Your Inbox or Wait",
+    skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.EMAIL,
+  },
+
+  /**
+   * Verify Email Rate Limiter
+   * Prevents Brute-Force JWT Guessing
+   * IP-Only — Token is Already Short-Lived, Guessing is Impractical
+   * Only Counts Failed Attempts
+   */
+  [RATE_LIMITERS.VERIFY_EMAIL]: {
+    windowMs: TOKEN_VERIFY_LIMIT_WINDOW_MS,
+    limit: TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS,
+    prefix: `${APP_NAME}:ratelimit:auth:verify-email:`,
+    message: "Too Many Verification Attempts. Please Try Again Later",
+    skipSuccessfulRequests: true,
+    limitBy: LIMIT_BY.IP,
+  },
+
+  /**
+   * Forgot Password Rate Limiter
    * Prevents Email Enumeration and Spam
-   * Counts ALL Requests to Prevent Discovering Registered Emails
-   * Applied to BOTH "/forgot-password" AND "/update-password" Endpoints
+   * Email-Only — Prevents Email Spam (Emails have a Cost)
+   * Counts ALL Requests
    */
-  [RATE_LIMITER_NAMES.PASSWORD_RESET]: {
-    windowMs: PASSWORD_RESET_LIMIT_WINDOW_MS,
-    limit: PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
-    prefix: `${APP_NAME}:ratelimit:auth:password-reset:`,
-    message: "Too Many Password Reset Requests - Please Try Again Later",
+  [RATE_LIMITERS.FORGOT_PASSWORD]: {
+    windowMs: AUTH_ACTION_LIMIT_WINDOW_MS,
+    limit: AUTH_ACTION_LIMIT_MAX_ATTEMPTS,
+    prefix: `${APP_NAME}:ratelimit:auth:forgot-password:`,
+    message:
+      "Too Many Password Reset Requests. Check Your Email or Try Again Later",
     skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.EMAIL,
   },
 
   /**
-   * Password Reset Verification Rate Limiter
-   * Prevents Brute-Force Token Guessing
-   * Only Counts Failed Verification Attempts
+   * Verify Password Reset Rate Limiter
+   * Prevents Brute-Force JWT Guessing Attacks
+   * Only Counts Failed Attempts
+   * Email-Only — Locks Down the Specific Account Being Targeted
    */
-  [RATE_LIMITER_NAMES.VERIFY_PASSWORD_RESET]: {
-    windowMs: VERIFY_PASSWORD_RESET_LIMIT_WINDOW_MS,
-    limit: VERIFY_PASSWORD_RESET_LIMIT_MAX_ATTEMPTS,
+  [RATE_LIMITERS.VERIFY_PASSWORD_RESET]: {
+    windowMs: TOKEN_VERIFY_LIMIT_WINDOW_MS,
+    limit: TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS,
     prefix: `${APP_NAME}:ratelimit:auth:verify-password-reset:`,
-    message: "Too Many Password Reset Attempts - Please Try Again Later",
+    message: "Too Many Verification Attempts. Please Try Again Later",
     skipSuccessfulRequests: true,
+    limitBy: LIMIT_BY.EMAIL,
+  },
+
+  /**
+   * Update Password Rate Limiter
+   * Prevents Brute-Force Against Authenticated Sessions
+   * Email-Only — Authenticated Endpoint, Email Available from req.user
+   * Counts ALL Requests
+   */
+  [RATE_LIMITERS.UPDATE_PASSWORD]: {
+    windowMs: AUTH_ACTION_LIMIT_WINDOW_MS,
+    limit: AUTH_ACTION_LIMIT_MAX_ATTEMPTS,
+    prefix: `${APP_NAME}:ratelimit:auth:update-password:`,
+    message: "Too Many Password Update Attempts. Please Try Again Later",
+    skipSuccessfulRequests: false,
+    limitBy: LIMIT_BY.EMAIL,
   },
 };

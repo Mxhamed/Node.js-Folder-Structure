@@ -1,6 +1,6 @@
 import { RedisStore } from "rate-limit-redis";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
-import { RATE_LIMITER_CONFIGS } from "../constants/index.js";
+import { LIMIT_BY, RATE_LIMITER_CONFIGS } from "../constants/index.js";
 import {
   InternalServerError,
   ServiceUnavailableError,
@@ -75,6 +75,27 @@ export const initializeRateLimiters = (redisClient) => {
 };
 
 /**
+ * Key Generator Strategy Map
+ * Maps Each LIMIT_BY Strategy to Its Corresponding Key Generation Function
+ * Falls Back to IP if Email is Unavailable
+ *
+ * @private
+ */
+const keyGenerators = {
+  [LIMIT_BY.IP]: (req, ip) => ip,
+
+  [LIMIT_BY.EMAIL]: (req, ip) => {
+    const email = req.validatedBody?.email || req.user?.email;
+    return email ? `email:${email}` : ip;
+  },
+
+  [LIMIT_BY.IP_AND_EMAIL]: (req, ip) => {
+    const email = req.validatedBody?.email || req.user?.email;
+    return email ? `${ip}:email:${email}` : ip;
+  },
+};
+
+/**
  * Create a Single Rate Limiter from Configuration
  * @private
  *
@@ -103,7 +124,11 @@ function createLimiter(name, config) {
       prefix: config.prefix,
     }),
 
-    keyGenerator: secureKeyGenerator,
+    keyGenerator: (req) => {
+      const ip = ipKeyGenerator(req.ip);
+      const generator = keyGenerators[config.limitBy];
+      return generator(req, ip);
+    },
 
     handler: (req, res, next) => {
       throw new TooManyRequestsError(config.message);
@@ -112,62 +137,15 @@ function createLimiter(name, config) {
 }
 
 /**
- * Secure Key Generator that Handles IPv6 Properly
- * Uses express-rate-limit's Built-In IPv6 Normalization
- * @private
- *
- * @param {Object} req - Express Request Object
- * @returns {string} Normalized IP Address for Rate Limiting
- */
-function secureKeyGenerator(req) {
-  const ip = getClientIp(req);
-  return ipKeyGenerator(ip); // Handles IPv6 Normalization
-}
-
-/**
- * Get Client's Real IP Address
- * Handles Various Proxy Scenarios (Nginx, Cloudflare, AWS ALB, etc.)
- * @private
- *
- * @param {Object} req - Express Request Object
- * @returns {string} Client IP Address
- */
-function getClientIp(req) {
-  // 1. Check X-Forwarded-For (Most Common with Proxies)
-  const forwardedFor = req.headers["x-forwarded-for"];
-  if (forwardedFor) {
-    // Get Leftmost IP (Original Client)
-    // Format: "client, proxy1, proxy2"
-    const ips = forwardedFor.split(",").map((ip) => ip.trim());
-    return ips[0];
-  }
-
-  // 2. Check X-Real-IP (Nginx)
-  const realIp = req.headers["x-real-ip"];
-  if (realIp) return realIp;
-
-  // 3. Check CF-Connecting-IP (Cloudflare)
-  const cfIp = req.headers["cf-connecting-ip"];
-  if (cfIp) return cfIp;
-
-  // 4. Check X-Client-IP
-  const clientIp = req.headers["x-client-ip"];
-  if (clientIp) return clientIp;
-
-  // 5. Fallback to req.ip (After Trust Proxy is Set)
-  return req.ip || req.socket.remoteAddress || "unknown";
-}
-
-/**
  * Get a Rate Limiter by Name
  * Use this in Route Handlers to Apply Specific Rate Limiting
  *
- * @param {string} name - Rate Limiter Name (from RATE_LIMITER_NAMES)
+ * @param {string} name - Rate Limiter Name (from RATE_LIMITERS)
  * @returns {Function} Express Rate Limiter Middleware
  * @throws {Error} If Rate Limiter with Given Name DOESN'T Exist
  *
  * @example
- * router.post("/login", getLimiter(RATE_LIMITER_NAMES.LOGIN), loginController);
+ * router.post("/login", getLimiter(RATE_LIMITERS.LOGIN), loginController);
  */
 export const getLimiter = (name) => {
   const limiter = limiters[name];
