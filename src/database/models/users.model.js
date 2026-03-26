@@ -1,59 +1,98 @@
 import mongoose from "mongoose";
-import { USER_ROLES } from "../../constants/index.js";
+import { GENDERS, PATTERNS, USER_ROLES } from "../../constants/index.js";
+import {
+  hashPassword,
+  decrypt,
+  encrypt,
+  maskPhone,
+} from "../../utils/index.js";
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: String,
-    lastName: String,
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 1,
+      maxLength: 50,
+    },
+
+    lastName: {
+      type: String,
+      required: true,
+      minLength: 1,
+      maxLength: 50,
+    },
+
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
-      match: /^\S+@\S+\.\S+$/,
+      trim: true,
+      index: {
+        name: "idx_email_unique",
+        unique: true,
+      },
     },
+
     password: {
       type: String,
       required: true,
+      set: hashPassword,
     },
-    age: {
-      type: mongoose.Schema.Types.Int32,
-      min: 16,
-      max: 120,
+
+    phone: {
+      type: String,
+      required: true,
+      pattern: PATTERNS.PHONE,
+      set: encrypt,
+      get: decrypt,
     },
+
+    gender: {
+      type: String,
+      required: true,
+      enum: Object.values(GENDERS),
+    },
+
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
       default: USER_ROLES.USER,
     },
-    lastLogin: {
+
+    emailVerifiedAt: {
       type: Date,
-      default: Date.now, // Pass the Function Reference
     },
-    profile: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile",
+
+    globalLogoutAt: {
+      type: Date,
+    },
+
+    deletedAt: {
+      type: Date,
     },
   },
   {
     versionKey: false, // Removes the `__v` Field
     timestamps: true, // Adds `createdAt` & `updatedAt` Fields
-    toJSON: { virtuals: true }, // Include Virtuals When Converting to JSON
-    toObject: { virtuals: true }, // Include Virtuals When Converting to Plain Object
-    id: false, // Disables Automatic `id` Getter
+    toJSON: { getters: true, virtuals: true }, // Include Getters & Virtuals When Converting to JSON
+    toObject: { getters: true, virtuals: true }, // Include Getters & Virtuals When Converting to Plain Object
+    id: false, // Disables the Automatic `id` Virtual Getter
   },
 );
 
-// Getter → Combines Fields
 userSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// Setter → Splits Value into Fields
 userSchema.virtual("fullName").set(function (name) {
   const [first, last] = name.split(" ");
   this.firstName = first;
   this.lastName = last;
+});
+
+userSchema.virtual("maskedPhone").get(function () {
+  return maskPhone(this.phone);
 });
 
 export const User = mongoose.models?.User ?? mongoose.model("User", userSchema);

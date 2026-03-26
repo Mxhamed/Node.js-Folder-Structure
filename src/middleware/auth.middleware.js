@@ -39,8 +39,12 @@ export const authenticate = async (req, res, next) => {
   const { sub, iat, jti } = decodedToken;
 
   // Check If User Exists
-  const user = await User.findById(sub).select("-password").lean().exec();
-  if (!user) throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
+  const user = await User.findById(sub)
+    .select("-password -phone")
+    .lean()
+    .exec();
+  if (!user || user.deletedAt)
+    throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
 
   // Check Global Logout
   if (user.globalLogoutAt) {

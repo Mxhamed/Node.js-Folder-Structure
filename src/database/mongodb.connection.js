@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import {
-  DB_URI,
+  MONGODB_URI,
   APP_NAME,
   IS_DEVELOPMENT,
 } from "../../config/config.service.js";
@@ -19,7 +19,7 @@ export const connectToMongoDB = async () => {
   }
 
   try {
-    await mongoose.connect(DB_URI, {
+    await mongoose.connect(MONGODB_URI, {
       dbName: APP_NAME,
     });
 

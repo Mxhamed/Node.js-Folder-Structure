@@ -10,12 +10,12 @@ export const IS_PRODUCTION = NODE_ENV === "production";
 export const IS_DEVELOPMENT = NODE_ENV === "development";
 
 // Load Environment-Specific .env File
-const envPath = resolve(`./config/.env.${NODE_ENV}`);
+const envPath = resolve(`.env.${NODE_ENV}`);
 const result = config({ path: envPath, quiet: true });
 
 if (result.error) {
   console.warn(`⚠️  Warning: COULDN'T Load ${envPath}`);
-  console.warn("Falling Back to Environment Variables");
+  console.warn("   Falling Back to Environment Variables");
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -31,13 +31,14 @@ export const TRUST_PROXY = parseInt(process.env.TRUST_PROXY, 10) || 1;
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // MongoDB
-export const DB_URI = process.env.DB_URI;
+export const MONGODB_URI = process.env.MONGODB_URI;
 
 // Redis
 export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 // Validate Critical Database Config
-if (!DB_URI) throw new Error("DB_URI is Required in Environment Variables");
+if (!MONGODB_URI)
+  throw new Error("MONGODB_URI is Required in Environment Variables");
 
 if (!REDIS_URL) {
   throw new Error("REDIS_URL is Required in Environment Variables");
