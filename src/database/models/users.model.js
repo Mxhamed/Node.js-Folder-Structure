@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
-import { GENDERS, PATTERNS, USER_ROLES } from "../../constants/index.js";
-import {
-  hashPassword,
-  decrypt,
-  encrypt,
-  maskPhone,
-} from "../../utils/index.js";
+import { GENDERS, USER_ROLES } from "../../constants/index.js";
+import { decrypt, encrypt, maskPhone } from "../../utils/index.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -37,13 +32,11 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      set: hashPassword,
     },
 
     phone: {
       type: String,
       required: true,
-      pattern: PATTERNS.PHONE,
       set: encrypt,
       get: decrypt,
     },
