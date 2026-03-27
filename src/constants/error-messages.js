@@ -35,6 +35,7 @@ export const ERROR_MESSAGES = {
   // User Errors
   USER_NOT_FOUND: "User NOT Found",
   USER_ALREADY_EXISTS: "User with this Email ALREADY Exists",
+  EMAIL_ALREADY_VERIFIED: "Email is Already Verified",
 
   // General
   INTERNAL_ERROR: "Internal Server Error",

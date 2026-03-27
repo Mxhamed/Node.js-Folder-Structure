@@ -3,11 +3,16 @@ import { sendSuccess } from "../../utils/index.js";
 import { HTTP_STATUS } from "../../constants/index.js";
 
 export const signup = async (req, res) => {
-  const { name, email, password } = req.validatedBody;
-  const result = await AuthService.signup({ name, email, password });
+  const { fullName, email, password, phone, gender } = req.validatedBody;
+  await AuthService.signup({
+    fullName,
+    email,
+    password,
+    phone,
+    gender,
+  });
   sendSuccess(res, {
     message: "Account Created Successfully",
-    data: result,
     statusCode: HTTP_STATUS.CREATED,
   });
 };

@@ -85,10 +85,7 @@ export const toUnixTimestamp = (dateInput) => {
   }
 
   const date = new Date(dateInput);
-
-  if (isNaN(date.getTime())) {
-    throw new Error("Invalid Date");
-  }
+  if (isNaN(date.getTime())) throw new Error("Invalid Date");
 
   // Convert Milliseconds to Seconds
   return Math.floor(date.getTime() / 1000);
@@ -436,8 +433,8 @@ export const isValidDate = (date) => {
  * @returns {string} Relative Time Description
  *
  * @example
- * getRelativeTime(addMinutes(new Date(), -5)) // "5 minutes ago"
- * getRelativeTime(addHours(new Date(), 2)) // "in 2 hours"
+ * getRelativeTime(addMinutes(new Date(), -5)) // "5 Minutes Ago"
+ * getRelativeTime(addHours(new Date(), 2)) // "In 2 Hours"
  */
 export const getRelativeTime = (date) => {
   if (!date) throw new Error("Date is Required");
@@ -450,13 +447,16 @@ export const getRelativeTime = (date) => {
   const diffSec = Math.floor(Math.abs(diffMs) / 1000);
   const isPast = diffMs < 0;
 
+  // Return "just now" for Very Recent Times (Less than 1 Second)
+  if (diffSec < 1) return "Just Now";
+
   const intervals = [
-    { label: "year", seconds: 31536000 },
-    { label: "month", seconds: 2592000 },
-    { label: "day", seconds: 86400 },
-    { label: "hour", seconds: 3600 },
-    { label: "minute", seconds: 60 },
-    { label: "second", seconds: 1 },
+    { label: "Year", seconds: 31536000 },
+    { label: "Month", seconds: 2592000 },
+    { label: "Day", seconds: 86400 },
+    { label: "Hour", seconds: 3600 },
+    { label: "Minute", seconds: 60 },
+    { label: "Second", seconds: 1 },
   ];
 
   for (const interval of intervals) {
@@ -465,10 +465,29 @@ export const getRelativeTime = (date) => {
     if (count >= 1) {
       const plural = count > 1 ? "s" : "";
       return isPast
-        ? `${count} ${interval.label}${plural} ago`
-        : `in ${count} ${interval.label}${plural}`;
+        ? `${count} ${interval.label}${plural} Ago`
+        : `In ${count} ${interval.label}${plural}`;
     }
+    return "Just Now"; // Fallback
   }
+};
 
-  return "just now";
+/**
+ * Converts a Duration String to Seconds
+ * @param {string} duration - e.g. "15m", "24h", "7d"
+ * @returns {number} Duration in Seconds
+ */
+export const toSeconds = (duration) => {
+  const unit = duration.slice(-1);
+  const value = parseInt(duration.slice(0, -1), 10);
+  switch (unit) {
+    case "m":
+      return value * 60;
+    case "h":
+      return value * 60 * 60;
+    case "d":
+      return value * 24 * 60 * 60;
+    default:
+      throw new Error(`Unknown Duration Unit: ${unit}`);
+  }
 };

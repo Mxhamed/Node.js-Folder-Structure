@@ -33,6 +33,7 @@ export {
   endOfDay,
   isValidDate,
   getRelativeTime,
+  toSeconds,
 } from "./date.js";
 
 export {
@@ -56,6 +57,11 @@ export { encrypt, decrypt } from "./crypto.js";
 
 export { hashPassword, verifyPassword } from "./password.js";
 
-export { generateToken, decodeToken, verifyToken } from "./jwt.js";
+export {
+  generateToken,
+  generateAuthTokens,
+  decodeToken,
+  verifyToken,
+} from "./jwt.js";
 
 export { connectToSMTP, composeMail, sendMail } from "./mailer.js";

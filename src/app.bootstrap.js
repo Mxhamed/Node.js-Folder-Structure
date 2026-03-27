@@ -12,11 +12,10 @@ import {
 import { ERROR_MESSAGES, HTTP_STATUS } from "./constants/index.js";
 import { connectToMongoDB, connectToRedis, redis } from "./database/index.js";
 import { initializeRateLimiters } from "./middleware/index.js";
-// import { usersRouter } from "./modules/index.js";
 import {
-  sendError,
-  NotFoundError,
   connectToSMTP,
+  NotFoundError,
+  sendError,
   toTitleCase,
 } from "./utils/index.js";
 
@@ -58,6 +57,8 @@ export default async function bootstrap() {
   app.use("/api", rateLimiter);
 
   // API Routes
+  const { authRouter, usersRouter } = await import("./modules/index.js");
+  app.use("/api/auth", authRouter);
   // app.use("/api/users", usersRouter);
 
   // 404 Catch-All Handler

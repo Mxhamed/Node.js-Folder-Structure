@@ -5,7 +5,7 @@ import { config } from "dotenv";
 // ENVIRONMENT SETUP
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export const NODE_ENV = process.env.NODE_ENV || "development";
+export const NODE_ENV = process.env.NODE_ENV ?? "development";
 export const IS_PRODUCTION = NODE_ENV === "production";
 export const IS_DEVELOPMENT = NODE_ENV === "development";
 
@@ -22,9 +22,9 @@ if (result.error) {
 // SERVER CONFIGURATION
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export const APP_NAME = process.env.APP_NAME || "my_app";
-export const PORT = parseInt(process.env.PORT, 10) || 3000;
-export const TRUST_PROXY = parseInt(process.env.TRUST_PROXY, 10) || 1;
+export const APP_NAME = process.env.APP_NAME ?? "my_app";
+export const PORT = parseInt(process.env.PORT, 10) ?? 3000;
+export const TRUST_PROXY = parseInt(process.env.TRUST_PROXY, 10) ?? 1;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // DATABASE CONFIGURATION
@@ -34,7 +34,7 @@ export const TRUST_PROXY = parseInt(process.env.TRUST_PROXY, 10) || 1;
 export const MONGODB_URI = process.env.MONGODB_URI;
 
 // Redis
-export const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+export const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
 
 // Validate Critical Database Config
 if (!MONGODB_URI)
@@ -50,18 +50,19 @@ if (!REDIS_URL) {
 
 export const SMTP_USER = process.env.SMTP_USER;
 export const SMTP_PASS = process.env.SMTP_PASS;
+export const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // REQUEST CONFIGURATION
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export const REQUEST_BODY_LIMIT = process.env.REQUEST_BODY_LIMIT || "10mb";
+export const REQUEST_BODY_LIMIT = process.env.REQUEST_BODY_LIMIT ?? "10mb";
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CORS & SECURITY
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const corsOriginEnv = process.env.CORS_ORIGIN || "*";
+const corsOriginEnv = process.env.CORS_ORIGIN ?? "*";
 export const CORS_ORIGIN = corsOriginEnv
   .split(",")
   .map((origin) => origin.trim());
@@ -72,39 +73,39 @@ export const CORS_ORIGIN = corsOriginEnv
 
 // General API Rate Limiting
 export const RATE_LIMIT_WINDOW_MS =
-  parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
+  parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) ?? 60000;
 export const RATE_LIMIT_MAX_REQUESTS =
-  parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 60;
+  parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) ?? 60;
 
 // Signup Rate Limiting
 export const SIGNUP_LIMIT_WINDOW_MS =
-  parseInt(process.env.SIGNUP_LIMIT_WINDOW_MS, 10) || 3600000;
+  parseInt(process.env.SIGNUP_LIMIT_WINDOW_MS, 10) ?? 3600000;
 export const SIGNUP_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.SIGNUP_LIMIT_MAX_ATTEMPTS, 10) || 5;
+  parseInt(process.env.SIGNUP_LIMIT_MAX_ATTEMPTS, 10) ?? 5;
 
 // Login Rate Limiting
 export const LOGIN_LIMIT_WINDOW_MS =
-  parseInt(process.env.LOGIN_LIMIT_WINDOW_MS, 10) || 900000;
+  parseInt(process.env.LOGIN_LIMIT_WINDOW_MS, 10) ?? 900000;
 export const LOGIN_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.LOGIN_LIMIT_MAX_ATTEMPTS, 10) || 5;
+  parseInt(process.env.LOGIN_LIMIT_MAX_ATTEMPTS, 10) ?? 5;
 
 // Refresh Token Rate Limiting
 export const REFRESH_TOKEN_LIMIT_WINDOW_MS =
-  parseInt(process.env.REFRESH_TOKEN_LIMIT_WINDOW_MS, 10) || 900000;
+  parseInt(process.env.REFRESH_TOKEN_LIMIT_WINDOW_MS, 10) ?? 900000;
 export const REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS, 10) || 10;
+  parseInt(process.env.REFRESH_TOKEN_LIMIT_MAX_ATTEMPTS, 10) ?? 10;
 
 // Auth Action Rate Limiting (forgot-password, request-email-verification, update-password)
 export const AUTH_ACTION_LIMIT_WINDOW_MS =
-  parseInt(process.env.AUTH_ACTION_LIMIT_WINDOW_MS, 10) || 3600000;
+  parseInt(process.env.AUTH_ACTION_LIMIT_WINDOW_MS, 10) ?? 3600000;
 export const AUTH_ACTION_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.AUTH_ACTION_LIMIT_MAX_ATTEMPTS, 10) || 3;
+  parseInt(process.env.AUTH_ACTION_LIMIT_MAX_ATTEMPTS, 10) ?? 3;
 
 // Token Verification Rate Limiting (verify-email, verify-password-reset)
 export const TOKEN_VERIFY_LIMIT_WINDOW_MS =
-  parseInt(process.env.TOKEN_VERIFY_LIMIT_WINDOW_MS, 10) || 3600000;
+  parseInt(process.env.TOKEN_VERIFY_LIMIT_WINDOW_MS, 10) ?? 3600000;
 export const TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS =
-  parseInt(process.env.TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS, 10) || 10;
+  parseInt(process.env.TOKEN_VERIFY_LIMIT_MAX_ATTEMPTS, 10) ?? 10;
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ENCRYPTION
@@ -124,16 +125,16 @@ if (!CRYPTO_KEY || CRYPTO_KEY.length !== 32) {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // BCrypt
-export const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
+export const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS, 10) ?? 10;
 
 // Argon2
 export const ARGON2_HASH_LENGTH =
-  parseInt(process.env.ARGON2_HASH_LENGTH, 10) || 32;
-export const ARGON2_TIME_COST = parseInt(process.env.ARGON2_TIME_COST, 10) || 3;
+  parseInt(process.env.ARGON2_HASH_LENGTH, 10) ?? 32;
+export const ARGON2_TIME_COST = parseInt(process.env.ARGON2_TIME_COST, 10) ?? 3;
 export const ARGON2_MEMORY_COST =
-  parseInt(process.env.ARGON2_MEMORY_COST, 10) || 65536;
+  parseInt(process.env.ARGON2_MEMORY_COST, 10) ?? 65536;
 export const ARGON2_PARALLELISM =
-  parseInt(process.env.ARGON2_PARALLELISM, 10) || 4;
+  parseInt(process.env.ARGON2_PARALLELISM, 10) ?? 4;
 
 // Validate Argon2 Config
 if (ARGON2_TIME_COST < 2)
@@ -150,19 +151,19 @@ if (ARGON2_MEMORY_COST < 32768)
 
 // Access Token (Short-Lived, for API Requests)
 export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
-export const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
+export const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN ?? "15m";
 
 // Refresh Token (Long-Lived, for Getting New Access Tokens)
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 export const JWT_REFRESH_EXPIRES_IN =
-  process.env.JWT_REFRESH_EXPIRES_IN || "7d";
+  process.env.JWT_REFRESH_EXPIRES_IN ?? "7d";
 
 // Action Tokens (Single-Use, for Sensitive Operations)
 export const JWT_ACTION_SECRET = process.env.JWT_ACTION_SECRET;
 export const JWT_EMAIL_VERIFICATION_EXPIRES_IN =
-  process.env.JWT_EMAIL_VERIFICATION_EXPIRES_IN || "24h";
+  process.env.JWT_EMAIL_VERIFICATION_EXPIRES_IN ?? "24h";
 export const JWT_PASSWORD_RESET_EXPIRES_IN =
-  process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "15m";
+  process.env.JWT_PASSWORD_RESET_EXPIRES_IN ?? "15m";
 
 // Validate JWT Secrets
 if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET || !JWT_ACTION_SECRET) {
@@ -170,7 +171,15 @@ if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET || !JWT_ACTION_SECRET) {
 }
 
 if (JWT_ACCESS_SECRET === JWT_REFRESH_SECRET) {
-  console.warn("⚠️  Warning: Access and Refresh Secrets SHOULD be Different!");
+  console.warn("⚠️  Warning: Access and Refresh Secrets SHOULD be Different");
+}
+
+if (JWT_ACCESS_SECRET === JWT_ACTION_SECRET) {
+  console.warn("⚠️  Warning: Access and Action Secrets SHOULD be Different");
+}
+
+if (JWT_REFRESH_SECRET === JWT_ACTION_SECRET) {
+  console.warn("⚠️  Warning: Refresh and Action Secrets SHOULD be Different");
 }
 
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -178,4 +187,4 @@ if (JWT_ACCESS_SECRET === JWT_REFRESH_SECRET) {
 //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export const LOG_LEVEL =
-  process.env.LOG_LEVEL || (IS_DEVELOPMENT ? "debug" : "info");
+  process.env.LOG_LEVEL ?? (IS_DEVELOPMENT ? "debug" : "info");

@@ -6,7 +6,7 @@ import { APP_NAME } from "../../config/config.service.js";
  */
 export const REDIS_KEYS = {
   /**
-   * Stores a Revoked Token's JTI
+   * Stores a Revoked JTI
    * @param {string} sub - User ID
    * @param {string} jti - JWT ID
    * @returns {string} Redis key in Format: `${APP_NAME}:token_blacklist:${sub}:${jti}`

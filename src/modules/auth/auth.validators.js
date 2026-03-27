@@ -11,7 +11,6 @@ const fullName = Joi.string()
   });
 
 const email = Joi.string().email().lowercase().trim().required().messages({
-  "string.email": ERROR_MESSAGES.INVALID_EMAIL,
   "any.required": "Email is Required",
 });
 
@@ -50,6 +49,10 @@ export const signupSchema = Joi.object({
   fullName,
   email,
   password,
+  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords Do NOT Match",
+    "any.required": "Please Confirm Your Password",
+  }),
   phone,
   gender,
 });
