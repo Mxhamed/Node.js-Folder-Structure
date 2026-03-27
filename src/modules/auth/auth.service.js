@@ -37,13 +37,11 @@ export const signup = async ({ fullName, email, password, phone, gender }) => {
   const hashedPassword = await hashPassword(password);
 
   // Create User
-  //   fullName Triggers the Virtual Setter → firstName + lastName
-  //   phone gets Encrypted by the Setter
   await User.create({
-    fullName,
+    fullName, // Triggers the Virtual Setter → firstName + lastName
     email,
     password: hashedPassword,
-    phone,
+    phone, // Gets Encrypted by the Setter
     gender,
   });
 };
