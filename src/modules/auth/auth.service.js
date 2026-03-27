@@ -1,8 +1,6 @@
 import {
   FRONTEND_URL,
   JWT_REFRESH_EXPIRES_IN,
-  JWT_EMAIL_VERIFICATION_EXPIRES_IN,
-  JWT_PASSWORD_RESET_EXPIRES_IN,
 } from "../../../config/config.service.js";
 import {
   ERROR_MESSAGES,
@@ -22,7 +20,6 @@ import {
   composeMail,
   sendMail,
   toSeconds,
-  getRelativeTime,
   toUnixTimestamp,
 } from "../../utils/index.js";
 
@@ -71,7 +68,7 @@ export const login = async ({ email, password }) => {
 
 // ─────────────────────────────────────────────
 
-export const rotateToken = async (oldRefreshToken) => {
+export const refreshToken = async (oldRefreshToken) => {
   // Verify Token Signature & Expiry
   const decoded = verifyToken(oldRefreshToken, TOKEN_TYPES.REFRESH);
   const { sub, jti, iat, exp } = decoded;
@@ -132,7 +129,7 @@ export const requestEmailVerification = async (user) => {
     subject: "Verify Your Email Address",
     html: `
       <p>Hi ${user.firstName},</p>
-      <p>Click the Link below to Verify our Email. This Link Expires ${getRelativeTime(toSeconds(JWT_EMAIL_VERIFICATION_EXPIRES_IN))}.</p>
+      <p>Click the Link below to Verify our Email.</p>
       <a href="${FRONTEND_URL}/verify-email?token=${token}">Verify Email</a>
     `,
   });
@@ -180,7 +177,7 @@ export const forgotPassword = async (email) => {
     subject: "Reset Your Password",
     html: `
       <p>Hi ${user.firstName},</p>
-      <p>Click the Link below to Reset Your Password. This Link Expires ${getRelativeTime(toSeconds(JWT_PASSWORD_RESET_EXPIRES_IN))}.</p>
+      <p>Click the Link below to Reset Your Password.</p>
       <a href="${process.env.FRONTEND_URL}/reset-password?token=${token}">Reset Password</a>
       <p>If you didn't request this, ignore this email.</p>
     `,
@@ -197,8 +194,12 @@ export const resetPassword = async ({ token, newPassword }) => {
   const { sub } = decoded;
 
   // Check If User Exists
-  const user = await User.findById(sub).lean();
+  const user = await User.findById(sub).select("+password").lean();
   if (!user) throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
+
+  // Check If New Password is the Same as the Current One
+  const isSame = await verifyPassword(newPassword, user.password);
+  if (isSame) throw new BadRequestError(ERROR_MESSAGES.PASSWORD_SAME_AS_OLD);
 
   // Hash & Update Password
   const hashedPassword = await hashPassword(newPassword);

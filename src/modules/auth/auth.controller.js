@@ -28,7 +28,7 @@ export const login = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   const { refreshToken } = req.validatedBody;
-  const result = await AuthService.rotateToken(refreshToken);
+  const result = await AuthService.refreshToken(refreshToken);
   sendSuccess(res, {
     message: "Tokens Refreshed Successfully",
     data: result,

@@ -4,6 +4,7 @@ import {
   UnauthorizedError,
   ForbiddenError,
   verifyToken,
+  toUnixTimestamp,
 } from "../utils/index.js";
 
 /**

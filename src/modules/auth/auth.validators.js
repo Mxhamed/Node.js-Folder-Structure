@@ -85,5 +85,7 @@ export const updatePasswordSchema = Joi.object({
   oldPassword: Joi.string().required().messages({
     "any.required": "Old Password is Required",
   }),
-  newPassword: password,
+  newPassword: password.invalid(Joi.ref("oldPassword")).messages({
+    "any.invalid": ERROR_MESSAGES.PASSWORD_SAME_AS_OLD,
+  }),
 });

@@ -11,6 +11,13 @@ import {
 
 const router = Router();
 
+router.get(
+  "/verify-email",
+  validateQuery(AuthValidation.verifyEmailSchema),
+  getLimiter(RATE_LIMITERS.VERIFY_EMAIL),
+  AuthController.verifyEmail,
+);
+
 router.post(
   "/signup",
   validateBody(AuthValidation.signupSchema),
@@ -39,19 +46,16 @@ router.post(
   AuthController.requestEmailVerification,
 );
 
-router.get(
-  "/verify-email",
-  validateQuery(AuthValidation.verifyEmailSchema),
-  getLimiter(RATE_LIMITERS.VERIFY_EMAIL),
-  AuthController.verifyEmail,
-);
-
 router.post(
   "/forgot-password",
   validateBody(AuthValidation.forgotPasswordSchema),
   getLimiter(RATE_LIMITERS.FORGOT_PASSWORD),
   AuthController.forgotPassword,
 );
+
+router.post("/logout", authenticate, AuthController.logout);
+
+router.post("/logout-all", authenticate, AuthController.logoutAll);
 
 router.patch(
   "/reset-password",
@@ -67,9 +71,5 @@ router.patch(
   getLimiter(RATE_LIMITERS.UPDATE_PASSWORD),
   AuthController.updatePassword,
 );
-
-router.post("/logout", authenticate, AuthController.logout);
-
-router.post("/logout-all", authenticate, AuthController.logoutAll);
 
 export default router;

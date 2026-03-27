@@ -38,7 +38,7 @@ export const initializeRateLimiters = (redisClient) => {
   // Create ALL Limiters from Configuration with Error Tracking
   configs.forEach(([name, config]) => {
     try {
-      limiters[name] = createLimiter(name, config);
+      limiters[name] = createLimiter(config);
       successful.push(name);
     } catch (error) {
       failed.push({ name, error: error.message });
@@ -99,17 +99,10 @@ const keyGenerators = {
  * Create a Single Rate Limiter from Configuration
  * @private
  *
- * @param {string} name - Limiter Name (for Error Messages)
  * @param {Object} config - Rate Limiter Configuration
  * @returns {Function} Express Rate Limiter Middleware
  */
-function createLimiter(name, config) {
-  if (!redis) {
-    throw new InternalServerError(
-      `Redis Client NOT Initialized! Cannot Create "${name}" Rate Limiter`,
-    );
-  }
-
+function createLimiter(config) {
   return rateLimit({
     windowMs: config.windowMs,
     limit: config.limit,

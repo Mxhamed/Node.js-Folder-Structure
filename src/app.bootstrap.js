@@ -57,9 +57,8 @@ export default async function bootstrap() {
   app.use("/api", rateLimiter);
 
   // API Routes
-  const { authRouter, usersRouter } = await import("./modules/index.js");
+  const { authRouter } = await import("./modules/index.js");
   app.use("/api/auth", authRouter);
-  // app.use("/api/users", usersRouter);
 
   // 404 Catch-All Handler
   app.use((req, res, next) => {

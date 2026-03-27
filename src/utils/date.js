@@ -434,7 +434,7 @@ export const isValidDate = (date) => {
  *
  * @example
  * getRelativeTime(addMinutes(new Date(), -5)) // "5 Minutes Ago"
- * getRelativeTime(addHours(new Date(), 2)) // "In 2 Hours"
+ * getRelativeTime(addHours(new Date(), 2)) // "in 2 Hours"
  */
 export const getRelativeTime = (date) => {
   if (!date) throw new Error("Date is Required");
@@ -446,9 +446,6 @@ export const getRelativeTime = (date) => {
   const diffMs = d - now;
   const diffSec = Math.floor(Math.abs(diffMs) / 1000);
   const isPast = diffMs < 0;
-
-  // Return "just now" for Very Recent Times (Less than 1 Second)
-  if (diffSec < 1) return "Just Now";
 
   const intervals = [
     { label: "Year", seconds: 31536000 },
@@ -466,10 +463,11 @@ export const getRelativeTime = (date) => {
       const plural = count > 1 ? "s" : "";
       return isPast
         ? `${count} ${interval.label}${plural} Ago`
-        : `In ${count} ${interval.label}${plural}`;
+        : `in ${count} ${interval.label}${plural}`;
     }
-    return "Just Now"; // Fallback
   }
+
+  return "just now";
 };
 
 /**
