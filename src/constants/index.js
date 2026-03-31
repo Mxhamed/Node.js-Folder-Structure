@@ -1,8 +1,8 @@
-export { PATTERNS } from "./pattern.js";
+export { PATTERNS } from "./patterns.js";
 
 export { USER_ROLES } from "./user-roles.js";
 
-export { GENDERS } from "./gender.js";
+export { GENDERS } from "./genders.js";
 
 export { HTTP_STATUS } from "./http-status.js";
 
