@@ -1,11 +1,13 @@
 import Joi from "joi";
 import { PATTERNS, ERROR_MESSAGES, USER_ROLES } from "../../constants/index.js";
 
+// ─── Constants ──────────────────────────────────────────
+
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-// ─────────────────────────────────────────────
+// ─── Schemas ──────────────────────────────────────────
 
 export const userIdSchema = Joi.object({
   id: Joi.string().pattern(PATTERNS.OBJECT_ID).required().messages({

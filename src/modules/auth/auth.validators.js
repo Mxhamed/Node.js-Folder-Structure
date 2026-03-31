@@ -55,7 +55,7 @@ const token = Joi.string().trim().required().messages({
   "any.required": "Token is Required",
 });
 
-// ─────────────────────────────────────────────
+// ─── Schemas ──────────────────────────────────────────
 
 export const registerSchema = Joi.object({
   fullName: fullName.concat(Joi.string().required()),
