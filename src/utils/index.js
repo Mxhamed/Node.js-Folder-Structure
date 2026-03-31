@@ -51,7 +51,12 @@ export {
   GatewayTimeoutError,
 } from "./AppError.js";
 
-export { sendSuccess, sendError, sendPaginated } from "./response.js";
+export {
+  sendSuccess,
+  sendError,
+  sendPaginated,
+  sendCursorPaginated,
+} from "./response.js";
 
 export { encrypt, decrypt } from "./crypto.js";
 

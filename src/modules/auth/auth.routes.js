@@ -11,18 +11,13 @@ import {
 
 const router = Router();
 
-router.get(
-  "/verify-email",
-  validateQuery(AuthValidation.verifyEmailSchema),
-  getLimiter(RATE_LIMITERS.VERIFY_EMAIL),
-  AuthController.verifyEmail,
-);
+// ─── Authentication & Identity Management ──────────────────────────────────────────
 
 router.post(
-  "/signup",
-  validateBody(AuthValidation.signupSchema),
+  "/register",
+  validateBody(AuthValidation.registerSchema),
   getLimiter(RATE_LIMITERS.SIGNUP),
-  AuthController.signup,
+  AuthController.register,
 );
 
 router.post(
@@ -32,6 +27,10 @@ router.post(
   AuthController.login,
 );
 
+router.post("/logout", authenticate, AuthController.logout);
+
+router.post("/logout-all", authenticate, AuthController.logoutAll);
+
 router.post(
   "/refresh-token",
   validateBody(AuthValidation.refreshTokenSchema),
@@ -39,12 +38,7 @@ router.post(
   AuthController.refreshToken,
 );
 
-router.post(
-  "/request-email-verification",
-  authenticate,
-  getLimiter(RATE_LIMITERS.REQUEST_EMAIL_VERIFICATION),
-  AuthController.requestEmailVerification,
-);
+// ─── Password Management ──────────────────────────────────────────
 
 router.post(
   "/forgot-password",
@@ -52,10 +46,6 @@ router.post(
   getLimiter(RATE_LIMITERS.FORGOT_PASSWORD),
   AuthController.forgotPassword,
 );
-
-router.post("/logout", authenticate, AuthController.logout);
-
-router.post("/logout-all", authenticate, AuthController.logoutAll);
 
 router.patch(
   "/reset-password",
@@ -71,5 +61,34 @@ router.patch(
   getLimiter(RATE_LIMITERS.UPDATE_PASSWORD),
   AuthController.updatePassword,
 );
+
+// ─── Email Verification ──────────────────────────────────────────
+
+router.post(
+  "/request-email-verification",
+  authenticate,
+  getLimiter(RATE_LIMITERS.REQUEST_EMAIL_VERIFICATION),
+  AuthController.requestEmailVerification,
+);
+
+router.get(
+  "/verify-email",
+  validateQuery(AuthValidation.verifyEmailSchema),
+  getLimiter(RATE_LIMITERS.VERIFY_EMAIL),
+  AuthController.verifyEmail,
+);
+
+// ─── Current User Profile ──────────────────────────────────────────
+
+router.get("/me", authenticate, AuthController.getCurrentUser);
+
+router.patch(
+  "/me",
+  authenticate,
+  validateBody(AuthValidation.updateProfileSchema),
+  AuthController.updateCurrentUser,
+);
+
+router.delete("/me", authenticate, AuthController.deleteCurrentUser);
 
 export default router;

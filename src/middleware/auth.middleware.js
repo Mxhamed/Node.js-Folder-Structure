@@ -40,7 +40,7 @@ export const authenticate = async (req, res, next) => {
   const { sub, iat, jti } = decodedToken;
 
   // Check If User Exists
-  const user = await User.findById(sub).lean().exec();
+  const user = await User.findById(sub).select("+deletedAt +globalLogoutAt");
   if (!user || user.deletedAt) {
     throw new UnauthorizedError(ERROR_MESSAGES.INVALID_TOKEN);
   }
@@ -59,9 +59,14 @@ export const authenticate = async (req, res, next) => {
   const isBlacklisted = await redis.get(blacklistKey);
   if (isBlacklisted) throw new UnauthorizedError(ERROR_MESSAGES.REVOKED_TOKEN);
 
+  // Strip Internal Fields
+  const userObj = user.toObject();
+  delete userObj.deletedAt;
+  delete userObj.globalLogoutAt;
+
   // Attach User and Token to Request
   req.token = decodedToken;
-  req.user = user;
+  req.user = userObj;
 
   next();
 };

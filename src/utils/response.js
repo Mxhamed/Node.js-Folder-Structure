@@ -76,3 +76,30 @@ export const sendPaginated = (res, { data, pagination, message }) => {
     },
   });
 };
+
+/**
+ * Send Cursor-Based Paginated Response
+ * @param {Object} res - Express Response Object
+ * @param {Object} options - Options
+ * @param {*} options.data - Paginated Data
+ * @param {Object} options.cursor - Cursor Metadata
+ * @param {string|null} options.cursor.nextCursor - Cursor for Next Page (null if Last Page)
+ * @param {string|null} options.cursor.prevCursor - Cursor for Previous Page (null if First Page)
+ * @param {boolean} options.cursor.hasMore - Whether More Items Exist
+ * @param {number} options.cursor.pageSize - Items per Page
+ * @param {string} options.message - Message (OPTIONAL)
+ */
+export const sendCursorPaginated = (res, { data, cursor, message }) => {
+  return res.status(HTTP_STATUS.OK).json({
+    success: true,
+    statusCode: HTTP_STATUS.OK,
+    ...(message && { message }),
+    data,
+    cursor: {
+      nextCursor: cursor.nextCursor,
+      prevCursor: cursor.prevCursor ?? null,
+      hasMore: cursor.hasMore,
+      pageSize: cursor.pageSize,
+    },
+  });
+};

@@ -1,6 +1,18 @@
 import mongoose from "mongoose";
 import { GENDERS, USER_ROLES } from "../../constants/index.js";
-import { decrypt, encrypt, maskPhone } from "../../utils/index.js";
+import { decrypt, encrypt, maskPhone, getAge } from "../../utils/index.js";
+
+const transformOptions = {
+  getters: true,
+  virtuals: true,
+  transform: (doc, ret) => {
+    delete ret.firstName;
+    delete ret.lastName;
+    delete ret.phone;
+    delete ret.dateOfBirth;
+    return ret;
+  },
+};
 
 const userSchema = new mongoose.Schema(
   {
@@ -31,14 +43,13 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true,
       select: false,
+      required: true,
     },
 
     phone: {
       type: String,
       required: true,
-      select: false,
       set: encrypt,
       get: decrypt,
     },
@@ -49,6 +60,11 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(GENDERS),
     },
 
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
@@ -57,22 +73,25 @@ const userSchema = new mongoose.Schema(
 
     emailVerifiedAt: {
       type: Date,
+      default: null,
     },
 
     globalLogoutAt: {
       type: Date,
+      select: false,
     },
 
     deletedAt: {
       type: Date,
+      select: false,
     },
   },
   {
-    versionKey: false, // Removes the `__v` Field
-    timestamps: true, // Adds `createdAt` & `updatedAt` Fields
-    toJSON: { getters: true, virtuals: true }, // Include Getters & Virtuals When Converting to JSON
-    toObject: { getters: true, virtuals: true }, // Include Getters & Virtuals When Converting to Plain Object
-    id: false, // Disables the Automatic `id` Virtual Getter
+    versionKey: false,
+    timestamps: true,
+    toJSON: transformOptions,
+    toObject: transformOptions,
+    id: false,
   },
 );
 
@@ -88,6 +107,10 @@ userSchema.virtual("fullName").set(function (name) {
 
 userSchema.virtual("maskedPhone").get(function () {
   return maskPhone(this.phone);
+});
+
+userSchema.virtual("age").get(function () {
+  return this.dateOfBirth ? getAge(this.dateOfBirth) : null;
 });
 
 export const User = mongoose.models?.User ?? mongoose.model("User", userSchema);
